@@ -55,7 +55,3 @@ BenchmarkDotNet.Artifacts/
 # Claude Code personal settings
 .claude/settings.local.json
 
-# Downloaded/exported model checkpoints (fetched on demand, see Laya.Onnx / Laya.TorchSharp)
-.artifacts/models/
-*.onnx
-*.safetensors
