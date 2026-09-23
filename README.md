@@ -18,23 +18,23 @@ output on the same request — see `tools/layar-export` and the numbers below.
 
 | Package | What it is |
 |---|---|
-| `Layar.Core` | Question/answer types, sequence building, calibration math, language/script routing, typed answer accessors. No ML dependency; AOT-safe. |
+| `Layar` | Question/answer types, sequence building, calibration math, language/script routing, typed answer accessors. No ML dependency; AOT-safe. |
 | `Layar.Tokenization` | A from-scratch BPE tokenizer (byte-level GPT-2-style + Metaspace/SentencePiece-style) reading a Hugging Face `tokenizer.json` directly. No external tokenizer package, no Python at runtime. |
 | `Layar.Onnx` | `IDecisionBackend` over ONNX Runtime. |
 | `Layar.TorchSharp` | `IDecisionBackend` over TorchSharp/libtorch. |
-| `Layar.Cli` | `predict` and `benchmark` commands. |
-| `Layar` | Meta-package: `Layar.Core` + `Layar.Tokenization` + `Layar.Onnx` in one install — the default, since ONNX Runtime doesn't need picking a native runtime variant the way TorchSharp does. |
-| `Layar.TorchSharp.Cpu` | Meta-package: `Layar.Core` + `Layar.Tokenization` + `Layar.TorchSharp` + the `TorchSharp-cpu` native runtime in one install. |
+| `Layar.Cli` (`layar`) | `predict` and `benchmark` commands, installable as a `dotnet tool`. |
+| `Layar.Onnx.Cpu` | Meta-package: `Layar` + `Layar.Tokenization` + `Layar.Onnx` in one install — the default, since ONNX Runtime doesn't need picking a native runtime variant the way TorchSharp does. |
+| `Layar.TorchSharp.Cpu` | Meta-package: `Layar` + `Layar.Tokenization` + `Layar.TorchSharp` + the `TorchSharp-cpu` native runtime in one install. |
 
 Install the meta-package that matches how you want to run it, or the individual `Layar.*` packages
 for full control (e.g. both backends side by side, to compare them):
 
 ```bash
-dotnet add package Layar                 # ONNX Runtime, one package
+dotnet add package Layar.Onnx.Cpu        # ONNX Runtime, one package
 # or
 dotnet add package Layar.TorchSharp.Cpu  # TorchSharp/libtorch, one package
 # or, for full control / both backends:
-dotnet add package Layar.Core
+dotnet add package Layar
 dotnet add package Layar.Tokenization
 dotnet add package Layar.Onnx
 dotnet add package Layar.TorchSharp
@@ -129,7 +129,7 @@ by a real bi-encoder (which Python's own docs note usually shortlists better any
 
 Not yet done: the full docs site. ONNX Runtime's ~2x latency gap vs. TorchSharp was investigated
 (`SessionOptions` thread/execution-mode tuning, see "Measured" above) and isn't a quick fix — see
-`AGENTS.md`'s rough edges. NativeAOT compatibility for `Layar.Onnx`/`Layar.Core` is designed for but
+`AGENTS.md`'s rough edges. NativeAOT compatibility for `Layar.Onnx`/`Layar` is designed for but
 not locally verified on this machine (its Xcode Command Line Tools SDK is currently broken,
 unrelated to this project — see `AGENTS.md`); CI's `macos-latest` runner should verify it properly.
 Filed [dotnet/TorchSharp#1581](https://github.com/dotnet/TorchSharp/issues/1581) asking about

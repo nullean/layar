@@ -9,7 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Laya.Core\Laya.Core.csproj" />
+    <ProjectReference Include="..\..\src\Layar.Core\Layar.Core.csproj" />
     <ProjectReference Include="..\..\src\Laya.Tokenization\Laya.Tokenization.csproj" />
     <ProjectReference Include="..\..\src\Laya.Onnx\Laya.Onnx.csproj" />
   </ItemGroup>

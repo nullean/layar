@@ -20,11 +20,12 @@ against each other — see [Getting started](getting-started/index.md) and the p
 
 | Package | What it is |
 |---|---|
-| `Layar.Core` | Question/answer types, sequence building, calibration math, language/script routing, the embedding shortlist for high-cardinality questions. No ML dependency; designed to be AOT-safe. |
+| `Layar` | Question/answer types, sequence building, calibration math, language/script routing, the embedding shortlist for high-cardinality questions. No ML dependency; designed to be AOT-safe. |
 | `Layar.Tokenization` | A from-scratch BPE tokenizer (byte-level GPT-2-style and Metaspace/SentencePiece-style) that reads a Hugging Face `tokenizer.json` directly. No external tokenizer package, no Python at runtime. |
 | `Layar.Onnx` | `IDecisionBackend` over ONNX Runtime. |
 | `Layar.TorchSharp` | `IDecisionBackend` over TorchSharp/libtorch. |
-| `Layar.Cli` | `predict` and `benchmark` commands. |
+| `Layar.Cli` (`layar`) | `predict` and `benchmark` commands, installable as a `dotnet tool`. |
+| `Layar.Onnx.Cpu` / `Layar.TorchSharp.Cpu` | Meta-packages bundling `Layar` + `Layar.Tokenization` + one backend (plus its native runtime for TorchSharp) in a single install. |
 
 ## Why a port at all
 

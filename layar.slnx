@@ -13,12 +13,12 @@
     <Project Path="build/scripts/scripts.fsproj" />
   </Folder>
   <Folder Name="/src/">
-    <Project Path="src/Laya.Core/Laya.Core.csproj" />
+    <Project Path="src/Layar.Core/Layar.Core.csproj" />
     <Project Path="src/Laya.Tokenization/Laya.Tokenization.csproj" />
     <Project Path="src/Laya.Onnx/Laya.Onnx.csproj" />
     <Project Path="src/Laya.TorchSharp/Laya.TorchSharp.csproj" />
     <Project Path="src/Laya.Cli/Laya.Cli.csproj" />
-    <Project Path="src/Layar/Layar.csproj" />
+    <Project Path="src/Layar.Onnx.Cpu/Layar.Onnx.Cpu.csproj" />
     <Project Path="src/Layar.TorchSharp.Cpu/Layar.TorchSharp.Cpu.csproj" />
   </Folder>
   <Folder Name="/tests/">

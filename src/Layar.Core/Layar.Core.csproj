@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Laya.Core</RootNamespace>
+    <!-- Not "Layar": the CLI's own AssemblyName is the lowercase "layar" command, and MSBuild's
+         project-name resolution is case-insensitive, so the two collide ("Ambiguous project name
+         'layar'") if this one matches too. PackageId is what actually matters for the "rename the
+         package to Layar" ask; nobody sees this assembly's file name. -->
+    <AssemblyName>Layar.Core</AssemblyName>
+    <PackageId>Layar</PackageId>
+    <Description>Typed decisions over state in one forward pass. Question/answer model, sequence building, calibration math and language routing — the backend-independent core of Layar. Install Layar.Onnx.Cpu or Layar.TorchSharp.Cpu for a ready-to-run bundle, or Layar.Onnx/Layar.TorchSharp individually for full control over the inference backend.</Description>
+    <PackageTags>decision-model;classification;calibration;nlp</PackageTags>
+    <IsAotCompatible>true</IsAotCompatible>
+    <NoWarn>CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="README.md" />
+    <None Include="..\..\nuget-icon.png" Pack="true" PackagePath="nuget-icon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Numerics.Tensors" />
+  </ItemGroup>
+
+</Project>

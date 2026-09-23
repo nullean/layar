@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <AssemblyName>Layar</AssemblyName>
-    <PackageId>Layar</PackageId>
-    <Description>Layar, batteries included: typed decisions over state in one forward pass, running on ONNX Runtime. Installs Layar.Core, Layar.Tokenization and Layar.Onnx as one package — the "just works everywhere" default (ONNX Runtime doesn't need picking a CPU/CUDA native package the way TorchSharp does). Prefer TorchSharp? Install Layar.TorchSharp.Cpu instead, or the individual Layar.* packages for full control.</Description>
+    <AssemblyName>Layar.Onnx.Cpu</AssemblyName>
+    <PackageId>Layar.Onnx.Cpu</PackageId>
+    <Description>Layar, batteries included: typed decisions over state in one forward pass, running on ONNX Runtime. Installs Layar, Layar.Tokenization and Layar.Onnx as one package — the "just works everywhere" default (ONNX Runtime doesn't need picking a CPU/CUDA native package the way TorchSharp does). Prefer TorchSharp? Install Layar.TorchSharp.Cpu instead, or the individual Layar.* packages for full control.</Description>
     <PackageTags>decision-model;classification;calibration;nlp;onnx</PackageTags>
     <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
@@ -16,7 +16,7 @@
   <ItemGroup>
     <!-- No source of its own — dotnet pack turns these ProjectReferences into NuGet dependency
          edges automatically, so this stays in lockstep with each package's real version. -->
-    <ProjectReference Include="..\Laya.Core\Laya.Core.csproj" />
+    <ProjectReference Include="..\Layar.Core\Layar.Core.csproj" />
     <ProjectReference Include="..\Laya.Tokenization\Laya.Tokenization.csproj" />
     <ProjectReference Include="..\Laya.Onnx\Laya.Onnx.csproj" />
   </ItemGroup>

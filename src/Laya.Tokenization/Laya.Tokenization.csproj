@@ -16,7 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Laya.Core\Laya.Core.csproj" />
+    <ProjectReference Include="..\Layar.Core\Layar.Core.csproj" />
   </ItemGroup>
 
 </Project>
