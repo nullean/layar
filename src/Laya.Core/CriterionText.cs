@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 
 namespace Laya.Core;
 
@@ -28,8 +29,8 @@ public static class CriterionText
 		return sb.ToString();
 	}
 
-	/// <summary>Like <see cref="Render"/>, but returns null for a missing/null/empty-string value
-	/// — the "no description, render the bare label" case <see cref="ChoiceOption"/> and
+	/// <summary>Like <see cref="Render(JsonElement)"/>, but returns null for a missing/null/empty-string
+	/// value — the "no description, render the bare label" case <see cref="ChoiceOption"/> and
 	/// <see cref="NoulQuestion"/> already treat specially.</summary>
 	public static string? RenderOrNull(JsonElement? value)
 	{
@@ -38,6 +39,28 @@ public static class CriterionText
 		if (v.ValueKind == JsonValueKind.String && v.GetString() is null or "")
 			return null;
 		return Render(v);
+	}
+
+	/// <summary>Renders a criterion built in code with <see cref="JsonNode"/>/<see cref="JsonObject"/>
+	/// (the mutable DOM <c>Email.cs</c>'s state-building already uses) rather than parsed from
+	/// external JSON. Round-trips through <see cref="JsonNode.ToJsonString"/> and
+	/// <see cref="JsonDocument.Parse(string, JsonDocumentOptions)"/> — both direct DOM operations,
+	/// not reflection, so this stays AOT-safe.</summary>
+	public static string Render(JsonNode? node)
+	{
+		if (node is null)
+			return "";
+		using var doc = JsonDocument.Parse(node.ToJsonString());
+		return Render(doc.RootElement);
+	}
+
+	/// <summary>Like <see cref="RenderOrNull(JsonElement?)"/>, for a <see cref="JsonNode"/>.</summary>
+	public static string? RenderOrNull(JsonNode? node)
+	{
+		if (node is null)
+			return null;
+		using var doc = JsonDocument.Parse(node.ToJsonString());
+		return RenderOrNull(doc.RootElement);
 	}
 
 	private static void Write(JsonElement value, StringBuilder sb)

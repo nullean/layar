@@ -1,4 +1,5 @@
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using AwesomeAssertions;
 using Laya.Core;
 
@@ -38,7 +39,7 @@ public class CriterionTextTests
 	[Test]
 	public async Task RenderOrNull_treats_missing_and_empty_string_as_no_description()
 	{
-		CriterionText.RenderOrNull(null).Should().BeNull();
+		CriterionText.RenderOrNull((JsonElement?)null).Should().BeNull();
 		CriterionText.RenderOrNull(Parse("null")).Should().BeNull();
 		CriterionText.RenderOrNull(Parse("\"\"")).Should().BeNull();
 	}
@@ -54,7 +55,21 @@ public class CriterionTextTests
 	[Test]
 	public async Task ChoiceOption_FromCriterion_with_null_omits_description()
 	{
-		var option = ChoiceOption.FromCriterion("other", null);
+		var option = ChoiceOption.FromCriterion("other", (JsonElement?)null);
 		option.Description.Should().BeNull();
+	}
+
+	[Test]
+	public async Task JsonNode_construction_side_matches_JsonElement_parse_side()
+	{
+		// Built in code with JsonObject/JsonArray (the mutable DOM Email.cs already uses), not
+		// parsed from external JSON text.
+		var node = new JsonObject
+		{
+			["keywords"] = new JsonArray("asap", "now"),
+			["weight"] = 2,
+		};
+		var option = ChoiceOption.FromCriterion("urgent", node);
+		option.Description.Should().Be("""{"keywords": ["asap", "now"], "weight": 2}""");
 	}
 }

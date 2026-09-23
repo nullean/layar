@@ -4,8 +4,9 @@ namespace Laya.Core;
 /// One labelled option of a <see cref="ChoiceQuestion"/>. <paramref name="Description"/> is
 /// rendered as <c>"{Label}: {Description}"</c>; a null or empty description renders as the bare
 /// label, matching the Python port's "only None/empty means no description" rule (a `false`-valued
-/// criterion is still a description, just not a string one — use <see cref="FromCriterion"/> for a
-/// non-string criterion, e.g. one ported from an existing Python question schema).
+/// criterion is still a description, just not a string one — use
+/// <see cref="FromCriterion(string, System.Text.Json.JsonElement?)"/> for a non-string criterion,
+/// e.g. one ported from an existing Python question schema).
 /// </summary>
 public readonly record struct ChoiceOption(string Label, string? Description)
 {
@@ -13,6 +14,12 @@ public readonly record struct ChoiceOption(string Label, string? Description)
 	/// <c>render_criterion</c> would — see <see cref="CriterionText"/>. Use this when a criterion is
 	/// structured (an object/array) or a bare number/bool rather than a plain string.</summary>
 	public static ChoiceOption FromCriterion(string label, System.Text.Json.JsonElement? criterion) =>
+		new(label, CriterionText.RenderOrNull(criterion));
+
+	/// <summary>Like <see cref="FromCriterion(string, System.Text.Json.JsonElement?)"/>, for a
+	/// criterion built in code with <see cref="System.Text.Json.Nodes.JsonNode"/>/<c>JsonObject</c>
+	/// rather than parsed from external JSON.</summary>
+	public static ChoiceOption FromCriterion(string label, System.Text.Json.Nodes.JsonNode? criterion) =>
 		new(label, CriterionText.RenderOrNull(criterion));
 }
 
