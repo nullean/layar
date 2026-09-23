@@ -78,12 +78,27 @@ for the numbers; they match to float precision.
   `DYLD_LIBRARY_PATH`/`LD_LIBRARY_PATH`** when running via `dotnet run` from a loose build output,
   and this repo's `UseArtifactsOutput=true` changes where that directory actually lands
   (`.artifacts/bin/<project>/<config>/runtimes/<rid>/native/`, not the classic
-  `bin/<config>/<tfm>/<rid>/cpu/`). A proper `dotnet publish` should not have this problem; it has
-  not been re-verified after a real publish because this machine's Xcode Command Line Tools SDK is
-  independently broken (see below), which blocks every `dotnet publish` here regardless of project.
-- **NativeAOT cannot be verified on this development machine.** Its Xcode Command Line Tools SDK
-  (`MacOSX27.0.sdk`) is a macOS-27-beta CLT installed ahead of the actual OS (26.6.1, i.e. this
-  machine is on the beta/developer update channel), and ships malformed `.tbd` stub files that
-  `clang`/`ld` cannot parse — confirmed with a trivial hello-world `PublishAot` console app,
-  unrelated to this project or to TorchSharp. CI's `macos-latest` runner should not have this
-  problem.
+  `bin/<config>/<tfm>/<rid>/cpu/`).
+- **`TorchSharp-cpu` 0.107.0's `libtorch_cpu.dylib` hardcodes an absolute load path to homebrew's
+  `libomp.dylib`** (`/opt/homebrew/opt/libomp/lib/libomp.dylib`), on macOS — confirmed by inspecting
+  the actual `dlopen` failure. This is unrelated to `dotnet run` vs. `dotnet publish`, or to AOT vs.
+  JIT: any process on a machine without that exact homebrew package installed hits the same missing
+  dependency, even from a fully consolidated publish/AOT output that bundles its own copy of
+  `libomp.dylib` right next to the binary — dyld doesn't search the executable's own directory for
+  an absolute-path dependency by default. `brew install libomp` fixes it outright; the alternative,
+  confirmed working, is pointing `DYLD_LIBRARY_PATH` at the directory containing the bundled
+  `libomp.dylib` (dyld does fall back to `DYLD_LIBRARY_PATH`, searched by basename, even for an
+  absolute-path dependency that failed to resolve).
+- **NativeAOT now verifies on this development machine, via a `SDKROOT` override — not a fix to
+  the Xcode Command Line Tools SDK itself.** Its default SDK
+  (`MacOSX27.0.sdk`, a macOS-27-beta CLT installed ahead of the actual OS, 26.6.1 — i.e. this
+  machine is enrolled in the beta/developer update channel) ships malformed `.tbd` stub files that
+  `clang`/`ld` cannot parse. Critically, plain `xcrun --show-sdk-path` (and `-sdk macosx`) still
+  resolve to that broken SDK by default — the working one has to be named explicitly:
+  `SDKROOT=$(xcrun --sdk macosx26.5 --show-sdk-path) dotnet publish ...`. With that,
+  `examples/layar-aot-smoketest` and `examples/layar-torchsharp-aot-smoketest` both publish and run
+  correctly, and — beyond what the committed smoketests check, since a real checkpoint can't ship in
+  CI — a NativeAOT binary referencing `Laya.TorchSharp` was verified end-to-end against a real
+  exported checkpoint: it loads the TorchScript module and produces the same prediction as the JIT
+  path. `Laya.TorchSharp` is AOT-compatible; the real Xcode CLT is still broken and this SDKROOT
+  override is a workaround, not a fix for it. CI's `macos-latest` runner is unaffected either way.

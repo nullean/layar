@@ -28,13 +28,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        smoketest:
+        # layar-torchsharp-aot-smoketest exercises the much heavier TorchSharp/libtorch dependency
+        # chain under PublishAot separately from the ONNX one, since the two backends pull in
+        # entirely different native dependencies.
+        - layar-aot-smoketest
+        - layar-torchsharp-aot-smoketest
         os:
         - runner: ubuntu-latest
-          binary: layar-aot-smoketest
+          ext: ''
         - runner: macos-latest
-          binary: layar-aot-smoketest
+          ext: ''
         - runner: windows-latest
-          binary: layar-aot-smoketest.exe
+          ext: '.exe'
     steps:
     - uses: actions/checkout@v6
 
@@ -43,10 +49,18 @@ jobs:
         global-json-file: ./global.json
 
     - name: Publish AOT
-      run: dotnet publish examples/layar-aot-smoketest
+      run: dotnet publish examples/${{ matrix.smoketest }}
 
     - name: Run AOT binary
-      run: ./.artifacts/publish/layar-aot-smoketest/release/${{ matrix.os.binary }}
+      shell: bash
+      run: |
+        # TorchSharp-cpu's libtorch_cpu.dylib hardcodes an absolute load path to homebrew's
+        # libomp.dylib on macOS (see AGENTS.md's rough edges) — DYLD_LIBRARY_PATH lets dyld fall
+        # back to the copy already bundled next to the binary instead.
+        if [ "$RUNNER_OS" = "macOS" ]; then
+          export DYLD_LIBRARY_PATH="$PWD/.artifacts/publish/${{ matrix.smoketest }}/release"
+        fi
+        ./.artifacts/publish/${{ matrix.smoketest }}/release/${{ matrix.smoketest }}${{ matrix.os.ext }}
 
   build:
     runs-on: ubuntu-latest

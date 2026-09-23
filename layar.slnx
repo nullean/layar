@@ -28,5 +28,6 @@
   </Folder>
   <Folder Name="/examples/">
     <Project Path="examples/layar-aot-smoketest/layar-aot-smoketest.csproj" />
+    <Project Path="examples/layar-torchsharp-aot-smoketest/layar-torchsharp-aot-smoketest.csproj" />
   </Folder>
 </Solution>

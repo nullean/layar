@@ -122,9 +122,12 @@ dotnet run --project tests/Laya.Tests/Laya.Tests.csproj -c Release
 ```
 
 TorchSharp's native `libtorch` needs `DYLD_LIBRARY_PATH`/`LD_LIBRARY_PATH` pointed at the
-consolidated native library directory when running via `dotnet run` from a loose build output
-(see `AGENTS.md` — this is a packaging rough edge, not a code issue, and does not affect a proper
-`dotnet publish`).
+consolidated native library directory when running via `dotnet run` from a loose build output (see
+`AGENTS.md`). Separately, on macOS, `TorchSharp-cpu`'s `libtorch_cpu.dylib` hardcodes an absolute
+load path to homebrew's `libomp.dylib` — `brew install libomp` fixes it, or point
+`DYLD_LIBRARY_PATH` at wherever `libomp.dylib` already landed (a published/AOT output bundles its
+own copy right next to the binary — see `AGENTS.md`'s rough edges for why dyld still needs pointing
+at it).
 
 ## Status
 
@@ -148,8 +151,14 @@ by a real bi-encoder (which Python's own docs note usually shortlists better any
 
 Not yet done: the full docs site. ONNX Runtime's ~2x latency gap vs. TorchSharp was investigated
 (`SessionOptions` thread/execution-mode tuning, see "Measured" above) and isn't a quick fix — see
-`AGENTS.md`'s rough edges. NativeAOT compatibility for `Layar.Onnx`/`Layar` is designed for but
-not locally verified on this machine (its Xcode Command Line Tools SDK is currently broken,
-unrelated to this project — see `AGENTS.md`); CI's `macos-latest` runner should verify it properly.
-Filed [dotnet/TorchSharp#1581](https://github.com/dotnet/TorchSharp/issues/1581) asking about
-Metal/MPS backend availability.
+`AGENTS.md`'s rough edges. Filed
+[dotnet/TorchSharp#1581](https://github.com/dotnet/TorchSharp/issues/1581) asking about Metal/MPS
+backend availability.
+
+NativeAOT compatibility is now verified, both `examples/layar-aot-smoketest` (Onnx) and
+`examples/layar-torchsharp-aot-smoketest` (TorchSharp), and — beyond what those check, since a real
+checkpoint can't ship in CI — a NativeAOT binary was confirmed locally to load a real exported
+checkpoint through `Laya.TorchSharp` and produce a correct prediction. `Layar` (root), `Laya.Onnx`
+and `Laya.TorchSharp` all declare `IsAotCompatible`. This machine's Xcode Command Line Tools SDK is
+still independently broken (see `AGENTS.md`); verifying past that needed an explicit `SDKROOT`
+override, not a fix to the SDK itself.

@@ -6,6 +6,7 @@
     <PackageId>Layar.TorchSharp</PackageId>
     <Description>TorchSharp (libtorch) backend for Layar's decision model: loads the same computation graph as a torch.jit.trace-exported TorchScript module and runs it through libtorch — one of two interchangeable IDecisionBackend implementations (the other is Layar.Onnx), so the two can be benchmarked against each other.</Description>
     <PackageTags>decision-model;torchsharp;libtorch</PackageTags>
+    <IsAotCompatible>true</IsAotCompatible>
     <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
 
