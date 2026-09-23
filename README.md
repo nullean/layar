@@ -87,22 +87,28 @@ consolidated native library directory when running via `dotnet run` from a loose
 
 ## Status
 
-This is a working, numerically-verified port of the core inference path (Core, Tokenization, Onnx,
-TorchSharp, a minimal Cli), including the full model-lifecycle Router (`RouterEngine`: load,
-preload, unload, attach, LRU eviction — the pure routing *decision* was ported first; the loading
-side wraps it), structured/non-string criteria (`CriterionText`, matching Python's
-`render_criterion`), and on-demand checkpoint downloading (`CheckpointCache` +
-`GitHubReleaseCheckpointUrls`, though nothing's published there yet — see above). Tokenizer
-conformance and full-pipeline parity against the Python oracle are committed regression tests, not
-one-off scratchpad checks — see `tests/Laya.Tests`. `tests/Laya.Benchmarks` has the real
-ONNX-vs-TorchSharp numbers (BenchmarkDotNet, not ad-hoc timing).
+This is a working, numerically-verified port of the full core surface: Core, Tokenization, Onnx,
+TorchSharp, a minimal Cli, the model-lifecycle Router (`RouterEngine`: load, preload, unload,
+attach, LRU eviction — the pure routing *decision* was ported first; the loading side wraps it),
+structured/non-string criteria (`CriterionText`, matching Python's `render_criterion`), on-demand
+checkpoint downloading (`CheckpointCache` + `GitHubReleaseCheckpointUrls`, though nothing's
+published there yet — see above), and the embedding shortlist for >20-option questions
+(`Shortlist` + `ShortlistPrediction`, matching `shortlist.py`/`predict_shortlist` exactly, including
+its tie-breaking and NaN/zero-vector edge cases). Tokenizer conformance and full-pipeline parity
+against the Python oracle are committed regression tests, not one-off scratchpad checks — see
+`tests/Laya.Tests`. `tests/Laya.Benchmarks` has the real ONNX-vs-TorchSharp numbers (BenchmarkDotNet,
+not ad-hoc timing).
 
-Not yet done: `Shortlist` (the embedding-based shortlist for >20-option questions — needs a design
-decision on what an `embed_fn` abstraction looks like in a strongly-typed API, which Python leaves
-entirely to the caller) and the full docs site. ONNX Runtime's ~2x latency gap vs. TorchSharp was
-investigated (`SessionOptions` thread/execution-mode tuning, see "Measured" above) and isn't a
-quick fix — see `AGENTS.md`'s rough edges. NativeAOT compatibility for `Layar.Onnx`/`Layar.Core` is
-designed for but not locally verified on this machine (its Xcode Command Line Tools SDK is
-currently broken, unrelated to this project — see `AGENTS.md`); CI's `macos-latest` runner should
-verify it properly. Filed [dotnet/TorchSharp#1581](https://github.com/dotnet/TorchSharp/issues/1581)
-asking about Metal/MPS backend availability.
+One deliberate gap: Python's `embed_fn_from_agent` (embeddings derived from the loaded checkpoint's
+own encoder) has no equivalent — `IDecisionBackend` only exposes the decision head's final output,
+not raw encoder hidden states, so that would need a third exported graph `tools/layar-export`
+doesn't produce today. `Shortlist` itself works with any `IEmbeddingProvider`, including one backed
+by a real bi-encoder (which Python's own docs note usually shortlists better anyway).
+
+Not yet done: the full docs site. ONNX Runtime's ~2x latency gap vs. TorchSharp was investigated
+(`SessionOptions` thread/execution-mode tuning, see "Measured" above) and isn't a quick fix — see
+`AGENTS.md`'s rough edges. NativeAOT compatibility for `Layar.Onnx`/`Layar.Core` is designed for but
+not locally verified on this machine (its Xcode Command Line Tools SDK is currently broken,
+unrelated to this project — see `AGENTS.md`); CI's `macos-latest` runner should verify it properly.
+Filed [dotnet/TorchSharp#1581](https://github.com/dotnet/TorchSharp/issues/1581) asking about
+Metal/MPS backend availability.
