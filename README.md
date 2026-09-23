@@ -40,6 +40,24 @@ A checkpoint directory (`model.onnx`, `model.pt`, `tokenizer/`, `config.json`) i
 `tools/layar-export/export.py`, a maintainer-run Python script that loads the original `laya`
 package's checkpoint and exports it — not shipped with the .NET library.
 
+### Downloading a checkpoint on demand
+
+Checkpoints (650MB-1.2GB) aren't committed to this repo. `CheckpointCache` downloads and caches one
+on first use — where they're hosted is pluggable (`CheckpointAssetUrl`); `GitHubReleaseCheckpointUrls`
+covers the case of attaching `tools/layar-export`'s output to a GitHub Release as flat assets:
+
+```csharp
+using var cache = new CheckpointCache(
+    cacheRoot: Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "layar", "models"),
+    assetUrl: GitHubReleaseCheckpointUrls.Create("nullean", "layar", "0.1.0"));
+
+var tokenizerDir = await cache.EnsureTokenizerAsync("multilingual");
+var onnxPath = await cache.EnsureOnnxModelAsync("multilingual"); // also fetches model.onnx.data if present
+```
+
+No checkpoints have actually been published there yet — that's a `git push` + a cut release + a
+`gh release upload` away, not a code change, so it hasn't been done as part of this port.
+
 ## Measured
 
 `tests/Laya.Benchmarks` (BenchmarkDotNet, `dotnet run -c Release --project tests/Laya.Benchmarks -- --filter '*'`)
@@ -72,9 +90,12 @@ consolidated native library directory when running via `dotnet run` from a loose
 This is a working, numerically-verified port of the core inference path (Core, Tokenization, Onnx,
 TorchSharp, a minimal Cli), including the full model-lifecycle Router (`RouterEngine`: load,
 preload, unload, attach, LRU eviction — the pure routing *decision* was ported first; the loading
-side wraps it) and structured/non-string criteria (`CriterionText`, matching Python's
-`render_criterion`). Tokenizer conformance and full-pipeline parity against the Python oracle are
-committed regression tests, not one-off scratchpad checks — see `tests/Laya.Tests`.
+side wraps it), structured/non-string criteria (`CriterionText`, matching Python's
+`render_criterion`), and on-demand checkpoint downloading (`CheckpointCache` +
+`GitHubReleaseCheckpointUrls`, though nothing's published there yet — see above). Tokenizer
+conformance and full-pipeline parity against the Python oracle are committed regression tests, not
+one-off scratchpad checks — see `tests/Laya.Tests`. `tests/Laya.Benchmarks` has the real
+ONNX-vs-TorchSharp numbers (BenchmarkDotNet, not ad-hoc timing).
 
 Not yet done: `Shortlist` (the embedding-based shortlist for >20-option questions — needs a design
 decision on what an `embed_fn` abstraction looks like in a strongly-typed API, which Python leaves
