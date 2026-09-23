@@ -66,6 +66,14 @@ for the numbers; they match to float precision.
   (verified: 1203.17 / -1437.54 on a real request) and `TensorPrimitives.SoftMax`'s own `exp()`
   overflows to `+Infinity` for inputs that large, turning `Infinity/Infinity` into `NaN` without the
   explicit max-subtraction.
+- **ONNX Runtime's ~3x latency gap vs. TorchSharp isn't a `SessionOptions` misconfiguration.**
+  Tried `IntraOpNumThreads` at 1/4/8, `GraphOptimizationLevel.ORT_ENABLE_ALL`, and
+  `ExecutionMode.ORT_PARALLEL` against the real exported model — default settings (which already
+  pick a sensible intra-op thread count) were at least as fast as every explicit override; more
+  threads than the default made it worse (8 threads: +15%; `ORT_PARALLEL` with 2 inter-op threads:
+  +30%), and 1 thread was catastrophic (5-6x slower). Whatever's behind the gap, it's not idle
+  thread-pool headroom — worth profiling the actual op-level breakdown before assuming it's fixable
+  at the `SessionOptions` level at all.
 - **TorchSharp's native `libtorch` needs the consolidated native directory on
   `DYLD_LIBRARY_PATH`/`LD_LIBRARY_PATH`** when running via `dotnet run` from a loose build output,
   and this repo's `UseArtifactsOutput=true` changes where that directory actually lands

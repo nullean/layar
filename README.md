@@ -67,9 +67,17 @@ consolidated native library directory when running via `dotnet run` from a loose
 ## Status
 
 This is a working, numerically-verified port of the core inference path (Core, Tokenization, Onnx,
-TorchSharp, a minimal Cli). Not yet done: the Python package's `Router`/`Presets`/`Shortlist`
-model-*loading* lifecycle (LRU eviction, preload — the pure routing *decision* logic is ported and
-tested), `Email`'s `Shortlist` module, a `Laya.Benchmarks` BenchmarkDotNet project, the AOT
-smoketest example, and the full docs site. NativeAOT compatibility for `Layar.Onnx`/`Layar.Core` is
+TorchSharp, a minimal Cli), including the full model-lifecycle Router (`RouterEngine`: load,
+preload, unload, attach, LRU eviction — the pure routing *decision* was ported first; the loading
+side wraps it) and structured/non-string criteria (`CriterionText`, matching Python's
+`render_criterion`). Tokenizer conformance and full-pipeline parity against the Python oracle are
+committed regression tests, not one-off scratchpad checks — see `tests/Laya.Tests`.
+
+Not yet done: `Shortlist` (the embedding-based shortlist for >20-option questions), a
+`Laya.Benchmarks` BenchmarkDotNet project, and the full docs site. ONNX Runtime's ~3x latency gap
+vs. TorchSharp was investigated (`SessionOptions` thread/execution-mode tuning) and isn't a quick
+fix — see `AGENTS.md`'s rough edges. NativeAOT compatibility for `Layar.Onnx`/`Layar.Core` is
 designed for but not locally verified on this machine (its Xcode Command Line Tools SDK is
-currently broken, unrelated to this project); CI's `macos-latest` runner should verify it properly.
+currently broken, unrelated to this project — see `AGENTS.md`); CI's `macos-latest` runner should
+verify it properly. Filed [dotnet/TorchSharp#1581](https://github.com/dotnet/TorchSharp/issues/1581)
+asking about Metal/MPS backend availability.
