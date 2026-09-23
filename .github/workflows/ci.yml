@@ -1,0 +1,94 @@
+name: Always be deploying
+
+on:
+  pull_request:
+    paths-ignore:
+      - 'README.md'
+      - '.editorconfig'
+  push:
+    paths-ignore:
+      - 'README.md'
+      - '.editorconfig'
+    branches:
+      - main
+    tags:
+      - "*.*.*"
+
+permissions:
+  contents: write
+
+env:
+  ARTIFACTS: 'build/output/*.nupkg'
+
+jobs:
+  aot-validate:
+    runs-on: ${{ matrix.os.runner }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+        - runner: ubuntu-latest
+          binary: layar-aot-smoketest
+        - runner: macos-latest
+          binary: layar-aot-smoketest
+        - runner: windows-latest
+          binary: layar-aot-smoketest.exe
+    steps:
+    - uses: actions/checkout@v6
+
+    - uses: actions/setup-dotnet@v5
+      with:
+        global-json-file: ./global.json
+
+    - name: Publish AOT
+      run: dotnet publish examples/layar-aot-smoketest
+
+    - name: Run AOT binary
+      run: ./.artifacts/publish/layar-aot-smoketest/release/${{ matrix.os.binary }}
+
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+      issues: write
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        fetch-depth: 1
+    - run: |
+        git fetch --prune --unshallow --tags
+        echo exit code $?
+        git tag --list
+    - uses: actions/setup-dotnet@v5
+      with:
+        dotnet-version: |
+          10.0.x
+
+    - run: ./build.sh build -s true
+      name: Build
+    - run: ./build.sh test -s true
+      name: Test
+    - run: ./build.sh generatepackages -s true
+      name: Generate local nuget packages
+    - run: ./build.sh validatepackages -s true
+      name: "validate *.nupkg files that were created"
+    - run: ./build.sh generateapichanges -s true
+      name: "Inspect public API changes"
+
+    - name: publish to github package repository
+      if: github.event_name == 'push' && startswith(github.ref, 'refs/heads')
+      shell: bash
+      run: |
+         until dotnet nuget push 'build/output/*.nupkg' -s https://nuget.pkg.github.com/nullean/index.json -k ${{secrets.GITHUB_TOKEN}} --skip-duplicate --no-symbols; do echo "Retrying"; sleep 1; done;
+
+    - run: ./build.sh generatereleasenotes -s true
+      name: Generate release notes for tag
+      if: github.event_name == 'push' && startswith(github.ref, 'refs/tags')
+    - run: ./build.sh createreleaseongithub -s true --token ${{secrets.GITHUB_TOKEN}}
+      if: github.event_name == 'push' && startswith(github.ref, 'refs/tags')
+      name: Create or update release for tag on github
+
+    - run: dotnet nuget push 'build/output/*.nupkg' -k ${{secrets.NUGET_ORG_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate --no-symbols
+      name: release to nuget.org
+      if: github.event_name == 'push' && startswith(github.ref, 'refs/tags')

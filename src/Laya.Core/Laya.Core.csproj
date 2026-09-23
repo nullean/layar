@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Laya.Core</RootNamespace>
+    <AssemblyName>Layar.Core</AssemblyName>
+    <PackageId>Layar.Core</PackageId>
+    <Description>Typed decisions over state in one forward pass. Question/answer model, sequence building, calibration math and language routing — the backend-independent core of the Layar decision engine.</Description>
+    <PackageTags>decision-model;classification;calibration;nlp</PackageTags>
+    <IsAotCompatible>true</IsAotCompatible>
+    <NoWarn>CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="README.md" />
+    <None Include="..\..\nuget-icon.png" Pack="true" PackagePath="nuget-icon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.Numerics.Tensors" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Laya.TorchSharp</RootNamespace>
+    <AssemblyName>Layar.TorchSharp</AssemblyName>
+    <PackageId>Layar.TorchSharp</PackageId>
+    <Description>TorchSharp (libtorch) backend for Layar's decision model: loads the same computation graph as a torch.jit.trace-exported TorchScript module and runs it through libtorch — one of two interchangeable IDecisionBackend implementations (the other is Layar.Onnx), so the two can be benchmarked against each other.</Description>
+    <PackageTags>decision-model;torchsharp;libtorch</PackageTags>
+    <NoWarn>CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="README.md" />
+    <None Include="..\..\nuget-icon.png" Pack="true" PackagePath="nuget-icon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Laya.Core\Laya.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="TorchSharp" />
+  </ItemGroup>
+
+</Project>

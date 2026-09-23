@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Laya.Cli</RootNamespace>
+    <AssemblyName>layar</AssemblyName>
+    <Description>Layar CLI: run typed decisions from the command line, and benchmark the ONNX and TorchSharp backends against each other.</Description>
+    <NoWarn>CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Laya.Core\Laya.Core.csproj" />
+    <ProjectReference Include="..\Laya.Tokenization\Laya.Tokenization.csproj" />
+    <ProjectReference Include="..\Laya.Onnx\Laya.Onnx.csproj" />
+    <ProjectReference Include="..\Laya.TorchSharp\Laya.TorchSharp.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="TorchSharp-cpu" />
+  </ItemGroup>
+
+</Project>

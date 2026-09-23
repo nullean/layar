@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>Laya.Tokenization</RootNamespace>
+    <AssemblyName>Layar.Tokenization</AssemblyName>
+    <PackageId>Layar.Tokenization</PackageId>
+    <Description>A hand-rolled BPE tokenizer covering the two checkpoint families Layar ships against: byte-level BPE (English/ModernBERT) and Metaspace BPE (multilingual/Gemma). Reads a Hugging Face tokenizer.json directly; no external tokenizer package or Python at runtime.</Description>
+    <PackageTags>tokenizer;bpe;nlp</PackageTags>
+    <IsAotCompatible>true</IsAotCompatible>
+    <NoWarn>CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="README.md" />
+    <None Include="..\..\nuget-icon.png" Pack="true" PackagePath="nuget-icon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Laya.Core\Laya.Core.csproj" />
+  </ItemGroup>
+
+</Project>
