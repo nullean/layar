@@ -84,7 +84,9 @@ var onnxPath = await cache.EnsureOnnxModelAsync("multilingual"); // also fetches
 ```
 
 No checkpoints have actually been published there yet — that needs the repo pushed to GitHub and
-`models-1.0.0` tagged, not a code change, so it hasn't been done as part of this port.
+`models-1.0.0` tagged, not a code change, so it hasn't been done as part of this port. The
+checkpoint itself is Apache-2.0 and explicitly tagged for commercial use — see
+[NOTICE.md](NOTICE.md) for the license check behind redistributing it.
 
 ### Releases
 
