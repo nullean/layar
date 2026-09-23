@@ -1,0 +1,77 @@
+name: Release models
+
+# Exports and publishes checkpoints as GitHub Release assets — decoupled from the library/CLI
+# release pipeline in ci.yml (which triggers on "v*.*.*") because checkpoints don't change on the
+# same cadence as the code: releasing v0.4.0 of Layar should never re-upload 3 checkpoints' worth
+# of weights, and cutting a new checkpoint export shouldn't force a library version bump either.
+# Tag with "models-<version>", e.g. "models-1.0.0" — this tag is what GitHubReleaseCheckpointUrls
+# then points at (see README's "Downloading a checkpoint on demand").
+on:
+  push:
+    tags:
+      - "models-*.*.*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag, e.g. models-1.0.0 (creates/updates this release)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  export-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install laya + export dependencies
+        run: pip install laya torch onnx onnxscript
+
+      - name: Export checkpoints
+        run: |
+          set -euo pipefail
+          python tools/layar-export/export.py convaiinnovations/laya \
+            -o .artifacts/models/english
+          python tools/layar-export/export.py convaiinnovations/laya --subfolder multilingual \
+            -o .artifacts/models/multilingual
+          python tools/layar-export/export.py convaiinnovations/laya --subfolder typed-decisions \
+            -o .artifacts/models/typed-decisions
+
+      - name: Flatten into release-asset names
+        # GitHub Release assets have no subdirectories; GitHubReleaseCheckpointUrls expects
+        # "{checkpointName}-{relativePath with / replaced by -}", e.g. "english-model.onnx" and
+        # "multilingual-tokenizer-tokenizer.json". Only tokenizer.json/tokenizer_config.json are
+        # actually read back (CheckpointCache.EnsureTokenizerAsync); config.json ships too, for
+        # future use, but the rest of what export.py writes under tokenizer/ does not.
+        run: |
+          set -euo pipefail
+          mkdir -p .artifacts/release-assets
+          for checkpoint in english multilingual typed-decisions; do
+            src=".artifacts/models/$checkpoint"
+            dst=".artifacts/release-assets"
+            cp "$src/model.onnx" "$dst/$checkpoint-model.onnx"
+            [ -f "$src/model.onnx.data" ] && cp "$src/model.onnx.data" "$dst/$checkpoint-model.onnx.data"
+            cp "$src/model.pt" "$dst/$checkpoint-model.pt"
+            cp "$src/config.json" "$dst/$checkpoint-config.json"
+            cp "$src/tokenizer/tokenizer.json" "$dst/$checkpoint-tokenizer-tokenizer.json"
+            cp "$src/tokenizer/tokenizer_config.json" "$dst/$checkpoint-tokenizer-tokenizer_config.json"
+          done
+          ls -lh "$dst"
+
+      - name: Create or update release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          tag="${{ github.event.inputs.tag || github.ref_name }}"
+          if ! gh release view "$tag" --repo "${{ github.repository }}" >/dev/null 2>&1; then
+            gh release create "$tag" --repo "${{ github.repository }}" \
+              --title "$tag" --notes "Checkpoints exported from convaiinnovations/laya."
+          fi
+          gh release upload "$tag" .artifacts/release-assets/* \
+            --repo "${{ github.repository }}" --clobber

@@ -12,7 +12,9 @@ on:
     branches:
       - main
     tags:
-      - "*.*.*"
+      # Library/CLI releases only — "v" prefix distinguishes these from "models-*" tags, which
+      # release checkpoints independently via release-models.yml and never touch this pipeline.
+      - "v*.*.*"
 
 permissions:
   contents: write

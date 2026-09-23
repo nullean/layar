@@ -67,21 +67,35 @@ package's checkpoint and exports it — not shipped with the .NET library.
 
 ### Downloading a checkpoint on demand
 
-Checkpoints (650MB-1.2GB) aren't committed to this repo. `CheckpointCache` downloads and caches one
-on first use — where they're hosted is pluggable (`CheckpointAssetUrl`); `GitHubReleaseCheckpointUrls`
-covers the case of attaching `tools/layar-export`'s output to a GitHub Release as flat assets:
+Checkpoints (650MB-1.2GB) aren't committed to this repo, and they don't release on the same tags as
+the library — a `models-<version>` tag (e.g. `models-1.0.0`), independent of the library's own
+`v<version>` tags, triggers `.github/workflows/release-models.yml` to export and upload them; see
+"Releases" below. `CheckpointCache` downloads and caches one on first use — where they're hosted is
+pluggable (`CheckpointAssetUrl`); `GitHubReleaseCheckpointUrls` covers the case of attaching
+`tools/layar-export`'s output to a GitHub Release as flat assets:
 
 ```csharp
 using var cache = new CheckpointCache(
     cacheRoot: Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "layar", "models"),
-    assetUrl: GitHubReleaseCheckpointUrls.Create("nullean", "layar", "0.1.0"));
+    assetUrl: GitHubReleaseCheckpointUrls.Create("nullean", "layar", "models-1.0.0"));
 
 var tokenizerDir = await cache.EnsureTokenizerAsync("multilingual");
 var onnxPath = await cache.EnsureOnnxModelAsync("multilingual"); // also fetches model.onnx.data if present
 ```
 
-No checkpoints have actually been published there yet — that's a `git push` + a cut release + a
-`gh release upload` away, not a code change, so it hasn't been done as part of this port.
+No checkpoints have actually been published there yet — that needs the repo pushed to GitHub and
+`models-1.0.0` tagged, not a code change, so it hasn't been done as part of this port.
+
+### Releases
+
+Two independent tag prefixes, so a library release never re-uploads unchanged model weights and a
+new checkpoint export never forces a library version bump (MinVer's own pattern for this — see its
+README, "Can I version multiple projects in a single repository independently?"):
+
+| Tag | Triggers | Versions |
+|---|---|---|
+| `v<major.minor.patch>`, e.g. `v0.2.0` | `.github/workflows/ci.yml` | `Layar`, `Layar.Tokenization`, `Layar.Onnx`, `Layar.TorchSharp`, `Layar.Cli` and the meta-packages (`MinVerTagPrefix` is `v`) |
+| `models-<major.minor.patch>`, e.g. `models-1.0.0` | `.github/workflows/release-models.yml` | The three checkpoints (english, multilingual, typed-decisions), exported fresh and uploaded as flat GitHub Release assets |
 
 ## Measured
 

@@ -18,6 +18,10 @@
     <TestingPlatformDotnetTestSupport>true</TestingPlatformDotnetTestSupport>
     <MinVerDefaultPreReleaseIdentifiers>canary.0</MinVerDefaultPreReleaseIdentifiers>
     <MinVerMinimumMajorMinor>0.1</MinVerMinimumMajorMinor>
+    <!-- "v" tags version the libraries/CLI; model checkpoints release independently under "models-"
+         tags (see .github/workflows/release-models.yml) and never reach MinVer at all — see
+         MinVer's README, "Can I version multiple projects in a single repository independently?" -->
+    <MinVerTagPrefix>v</MinVerTagPrefix>
   </PropertyGroup>
 
   <!-- src/ projects: packable, XML docs -->
