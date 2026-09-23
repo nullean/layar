@@ -42,15 +42,18 @@ package's checkpoint and exports it — not shipped with the .NET library.
 
 ## Measured
 
-On this repo's multilingual checkpoint, a real 3-question batched request, CPU, Apple M2:
+`tests/Laya.Benchmarks` (BenchmarkDotNet, `dotnet run -c Release --project tests/Laya.Benchmarks -- --filter '*'`)
+on this repo's multilingual checkpoint, a real 3-question batched request, CPU, Apple M2:
 
-| | latency | matches Python oracle |
-|---|---|---|
-| TorchSharp | ~78 ms | exact (confidence agreement to 1e-6) |
-| ONNX Runtime (default `SessionOptions`) | ~250 ms | exact (confidence agreement to 1e-6) |
+| Method | Mean | Ratio | Allocated |
+|---|---|---|---|
+| Onnx | 148.7 ms | 1.00 | 82.6 KB |
+| TorchSharp | 70.9 ms | 0.48 | 85.3 KB |
 
-TorchSharp is faster out of the box here; ONNX Runtime's session options haven't been tuned
-(thread count, graph optimization level) — that's an open area to improve, not a ceiling.
+TorchSharp is ~2.1x faster here. Both match the Python oracle exactly (confidence agreement to
+1e-6) — see `tests/Laya.Tests/PipelineParityTests.cs`. `SessionOptions` tuning (thread count,
+graph optimization level, execution mode) doesn't close the gap — see `AGENTS.md`'s rough edges
+for what was tried.
 
 ## Building
 
@@ -73,10 +76,11 @@ side wraps it) and structured/non-string criteria (`CriterionText`, matching Pyt
 `render_criterion`). Tokenizer conformance and full-pipeline parity against the Python oracle are
 committed regression tests, not one-off scratchpad checks — see `tests/Laya.Tests`.
 
-Not yet done: `Shortlist` (the embedding-based shortlist for >20-option questions), a
-`Laya.Benchmarks` BenchmarkDotNet project, and the full docs site. ONNX Runtime's ~3x latency gap
-vs. TorchSharp was investigated (`SessionOptions` thread/execution-mode tuning) and isn't a quick
-fix — see `AGENTS.md`'s rough edges. NativeAOT compatibility for `Layar.Onnx`/`Layar.Core` is
+Not yet done: `Shortlist` (the embedding-based shortlist for >20-option questions — needs a design
+decision on what an `embed_fn` abstraction looks like in a strongly-typed API, which Python leaves
+entirely to the caller) and the full docs site. ONNX Runtime's ~2x latency gap vs. TorchSharp was
+investigated (`SessionOptions` thread/execution-mode tuning, see "Measured" above) and isn't a
+quick fix — see `AGENTS.md`'s rough edges. NativeAOT compatibility for `Layar.Onnx`/`Layar.Core` is
 designed for but not locally verified on this machine (its Xcode Command Line Tools SDK is
 currently broken, unrelated to this project — see `AGENTS.md`); CI's `macos-latest` runner should
 verify it properly. Filed [dotnet/TorchSharp#1581](https://github.com/dotnet/TorchSharp/issues/1581)

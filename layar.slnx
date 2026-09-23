@@ -22,6 +22,7 @@
   <Folder Name="/tests/">
     <File Path="tests/Directory.Build.props" />
     <Project Path="tests/Laya.Tests/Laya.Tests.csproj" />
+    <Project Path="tests/Laya.Benchmarks/Laya.Benchmarks.csproj" />
   </Folder>
   <Folder Name="/examples/">
     <Project Path="examples/layar-aot-smoketest/layar-aot-smoketest.csproj" />
