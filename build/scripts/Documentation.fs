@@ -85,11 +85,11 @@ let ensureTool () =
     File.Delete zip
 
     if not (OperatingSystem.IsWindows()) then
-        File.SetUnixFileMode(
-            toolPath,
-            UnixFileMode.UserRead ||| UnixFileMode.UserWrite ||| UnixFileMode.UserExecute
-            ||| UnixFileMode.GroupRead ||| UnixFileMode.GroupExecute
-            ||| UnixFileMode.OtherRead ||| UnixFileMode.OtherExecute)
+        // F#'s generic numeric operators (`int`, `|||`) dispatch dynamically for enum types and
+        // throw NotSupportedException for UnixFileMode on this SDK. 0o755 (rwxr-xr-x) is the same
+        // bits UserRead|UserWrite|UserExecute|GroupRead|GroupExecute|OtherRead|OtherExecute would
+        // produce; writing the octal literal directly sidesteps the enum arithmetic entirely.
+        File.SetUnixFileMode(toolPath, enum<UnixFileMode> 0o755)
 
     printfn "docs-builder cached at %s" toolPath
     toolPath

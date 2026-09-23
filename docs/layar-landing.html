@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Layar</title>
+<meta name="description" content="A .NET port of Laya: typed decisions answered in one forward pass, with interchangeable ONNX Runtime and TorchSharp backends." />
+<base href="/" />
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #ffffff;
+    --fg: #1a1a1a;
+    --muted: #5a5a5a;
+    --accent: #2d5fff;
+    --border: #e2e2e2;
+    --code-bg: #f5f5f7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0c0d10;
+      --fg: #e8e8ea;
+      --muted: #9a9aa2;
+      --accent: #7fa0ff;
+      --border: #2a2b30;
+      --code-bg: #17181c;
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    line-height: 1.55;
+  }
+  main {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 4rem 1.25rem 5rem;
+  }
+  h1 {
+    font-size: 2rem;
+    margin: 0 0 0.35rem;
+  }
+  p.lede {
+    color: var(--muted);
+    font-size: 1.1rem;
+    margin: 0 0 2rem;
+  }
+  .backends {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1.5rem 0 2.5rem;
+  }
+  @media (max-width: 520px) {
+    .backends { grid-template-columns: 1fr; }
+  }
+  .backend {
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 1rem 1.1rem;
+  }
+  .backend h2 {
+    font-size: 1rem;
+    margin: 0 0 0.4rem;
+  }
+  .backend p {
+    color: var(--muted);
+    font-size: 0.92rem;
+    margin: 0;
+  }
+  .actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-bottom: 2.5rem;
+  }
+  .actions a {
+    display: inline-block;
+    padding: 0.6rem 1.1rem;
+    border-radius: 8px;
+    text-decoration: none;
+    font-size: 0.95rem;
+  }
+  .actions a.primary {
+    background: var(--accent);
+    color: #fff;
+  }
+  .actions a.secondary {
+    border: 1px solid var(--border);
+    color: var(--fg);
+  }
+  code {
+    background: var(--code-bg);
+    padding: 0.15em 0.4em;
+    border-radius: 4px;
+    font-size: 0.9em;
+  }
+  footer {
+    color: var(--muted);
+    font-size: 0.85rem;
+    border-top: 1px solid var(--border);
+    padding-top: 1.5rem;
+  }
+</style>
+</head>
+<body>
+<main>
+  <h1>Layar</h1>
+  <p class="lede">
+    A .NET port of <a href="https://github.com/NandhaKishorM/laya">Laya</a>: typed decisions
+    (<code>choice</code>, <code>score</code>, <code>noul</code>) answered over state in one
+    forward pass — no text generation, nothing to hallucinate.
+  </p>
+
+  <div class="backends">
+    <div class="backend">
+      <h2>Layar.Onnx</h2>
+      <p>ONNX Runtime. Portable, wide execution-provider support.</p>
+    </div>
+    <div class="backend">
+      <h2>Layar.TorchSharp</h2>
+      <p>libtorch, via a <code>torch.jit.trace</code>d module — not a hand-ported architecture.</p>
+    </div>
+  </div>
+
+  <div class="actions">
+    <a class="primary" href="getting-started/">Getting started</a>
+    <a class="secondary" href="https://github.com/nullean/layar">View on GitHub</a>
+  </div>
+
+  <footer>
+    Both backends are verified against the original Python package's own output, not just against
+    each other. See the project README for what's measured and what's still in progress.
+  </footer>
+</main>
+</body>
+</html>
