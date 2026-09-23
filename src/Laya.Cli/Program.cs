@@ -74,20 +74,14 @@ static async Task<int> RunPredict(string[] args)
 	var (engine, _, backend) = Load(modelDir, backendName);
 	using var _ = backend;
 
-	var questions = Presets.TriageQuestions();
-	var answers = await engine.PredictAsync(state, questions);
+	var answers = await engine.PredictAsync(state, Presets.TriageQuestions());
+	var triage = answers.AsTriage(); // typed accessor — no string keys, no casts, for a known preset schema
 
-	foreach (var (id, answer) in answers)
-	{
-		var line = answer switch
-		{
-			ChoiceAnswer c => $"{id}: {c.Choice} (confidence {c.Confidence:F2})",
-			ScoreAnswer s => $"{id}: {s.Score:F2} (confidence {s.Confidence:F2})",
-			NoulAnswer n => $"{id}: {n.Noul:F2} (confidence {n.Confidence:F2})",
-			_ => $"{id}: ?",
-		};
-		Console.WriteLine(line);
-	}
+	Console.WriteLine($"intent: {triage.Intent.Choice} (confidence {triage.Intent.Confidence:F2})");
+	Console.WriteLine($"is_urgent: {triage.IsUrgent.Noul:F2} (confidence {triage.IsUrgent.Confidence:F2})");
+	Console.WriteLine($"frustration: {triage.Frustration.Score:F2} (confidence {triage.Frustration.Confidence:F2})");
+	Console.WriteLine($"refund_requested: {triage.RefundRequested.Noul:F2} (confidence {triage.RefundRequested.Confidence:F2})");
+	Console.WriteLine($"churn_risk: {triage.ChurnRisk.Noul:F2} (confidence {triage.ChurnRisk.Confidence:F2})");
 	return 0;
 }
 

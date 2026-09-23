@@ -18,6 +18,8 @@
     <Project Path="src/Laya.Onnx/Laya.Onnx.csproj" />
     <Project Path="src/Laya.TorchSharp/Laya.TorchSharp.csproj" />
     <Project Path="src/Laya.Cli/Laya.Cli.csproj" />
+    <Project Path="src/Layar/Layar.csproj" />
+    <Project Path="src/Layar.TorchSharp.Cpu/Layar.TorchSharp.Cpu.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <File Path="tests/Directory.Build.props" />

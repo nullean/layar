@@ -18,22 +18,44 @@ output on the same request — see `tools/layar-export` and the numbers below.
 
 | Package | What it is |
 |---|---|
-| `Layar.Core` | Question/answer types, sequence building, calibration math, language/script routing. No ML dependency; AOT-safe. |
+| `Layar.Core` | Question/answer types, sequence building, calibration math, language/script routing, typed answer accessors. No ML dependency; AOT-safe. |
 | `Layar.Tokenization` | A from-scratch BPE tokenizer (byte-level GPT-2-style + Metaspace/SentencePiece-style) reading a Hugging Face `tokenizer.json` directly. No external tokenizer package, no Python at runtime. |
 | `Layar.Onnx` | `IDecisionBackend` over ONNX Runtime. |
 | `Layar.TorchSharp` | `IDecisionBackend` over TorchSharp/libtorch. |
 | `Layar.Cli` | `predict` and `benchmark` commands. |
+| `Layar` | Meta-package: `Layar.Core` + `Layar.Tokenization` + `Layar.Onnx` in one install — the default, since ONNX Runtime doesn't need picking a native runtime variant the way TorchSharp does. |
+| `Layar.TorchSharp.Cpu` | Meta-package: `Layar.Core` + `Layar.Tokenization` + `Layar.TorchSharp` + the `TorchSharp-cpu` native runtime in one install. |
+
+Install the meta-package that matches how you want to run it, or the individual `Layar.*` packages
+for full control (e.g. both backends side by side, to compare them):
+
+```bash
+dotnet add package Layar                 # ONNX Runtime, one package
+# or
+dotnet add package Layar.TorchSharp.Cpu  # TorchSharp/libtorch, one package
+# or, for full control / both backends:
+dotnet add package Layar.Core
+dotnet add package Layar.Tokenization
+dotnet add package Layar.Onnx
+dotnet add package Layar.TorchSharp
+dotnet add package TorchSharp-cpu
+```
 
 ## Quickstart
 
 ```csharp
 var tokenizer = HuggingFaceBpeTokenizer.FromDirectory("path/to/checkpoint/tokenizer");
 using var backend = new OnnxDecisionBackend("path/to/checkpoint/model.onnx"); // or TorchSharpDecisionBackend(...model.pt)
-var engine = new DecisionEngine(tokenizer, backend, maxLen: 1024, headMaxLen: 256);
+using var engine = new DecisionEngine(tokenizer, backend, maxLen: 1024, headMaxLen: 256);
 
 var answers = await engine.PredictAsync(
     "Hi, we were billed twice for March. Please refund the duplicate today.",
     Presets.TriageQuestions());
+
+// Typed accessors instead of casts/string-keyed lookups — AsTriage() is specific to this preset's
+// fixed schema; AnswerDictionaryExtensions' Choice()/Score()/Noul() work for any question id.
+var triage = answers.AsTriage();
+Console.WriteLine($"{triage.Intent.Choice} (confidence {triage.Intent.Confidence:F2})");
 ```
 
 A checkpoint directory (`model.onnx`, `model.pt`, `tokenizer/`, `config.json`) is produced by

@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <AssemblyName>Layar.TorchSharp.Cpu</AssemblyName>
+    <PackageId>Layar.TorchSharp.Cpu</PackageId>
+    <Description>Layar running on TorchSharp/libtorch, CPU only. Installs Layar.Core, Layar.Tokenization, Layar.TorchSharp and the TorchSharp-cpu native runtime as one package — the one-package "run it on TorchSharp" bundle. Need CUDA instead? Install Layar.TorchSharp plus the matching TorchSharp-cuda-* package yourself rather than this one.</Description>
+    <PackageTags>decision-model;classification;calibration;nlp;torchsharp;libtorch</PackageTags>
+    <NoWarn>CS1591</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="README.md" />
+    <None Include="..\..\nuget-icon.png" Pack="true" PackagePath="nuget-icon.png" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- No source of its own — dotnet pack turns these ProjectReferences into NuGet dependency
+         edges automatically, so this stays in lockstep with each package's real version. -->
+    <ProjectReference Include="..\Laya.Core\Laya.Core.csproj" />
+    <ProjectReference Include="..\Laya.Tokenization\Laya.Tokenization.csproj" />
+    <ProjectReference Include="..\Laya.TorchSharp\Laya.TorchSharp.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="TorchSharp-cpu" />
+  </ItemGroup>
+
+</Project>
