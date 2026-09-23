@@ -48,14 +48,17 @@ var tokenizer = HuggingFaceBpeTokenizer.FromDirectory("path/to/checkpoint/tokeni
 using var backend = new OnnxDecisionBackend("path/to/checkpoint/model.onnx"); // or TorchSharpDecisionBackend(...model.pt)
 using var engine = new DecisionEngine(tokenizer, backend, maxLen: 1024, headMaxLen: 256);
 
-var answers = await engine.PredictAsync(
+// TriageSchema.Instance is IQuestionSchema<TriageResult>: a fixed question set plus how to bind
+// the answers back into a record, so this returns TriageResult directly — no string-keyed lookup.
+var triage = await engine.PredictAsync(
     "Hi, we were billed twice for March. Please refund the duplicate today.",
-    Presets.TriageQuestions());
-
-// Typed accessors instead of casts/string-keyed lookups — AsTriage() is specific to this preset's
-// fixed schema; AnswerDictionaryExtensions' Choice()/Score()/Noul() work for any question id.
-var triage = answers.AsTriage();
+    TriageSchema.Instance);
 Console.WriteLine($"{triage.Intent.Choice} (confidence {triage.Intent.Confidence:F2})");
+
+// A caller-composed question set (e.g. EmailQuestions() with your own categories) has no fixed
+// shape to bind to, so it stays on the dictionary path — same call, typed accessors instead:
+var answers = await engine.PredictAsync("...", Presets.EmailQuestions(myCategories));
+var category = answers.Choice("category");
 ```
 
 A checkpoint directory (`model.onnx`, `model.pt`, `tokenizer/`, `config.json`) is produced by

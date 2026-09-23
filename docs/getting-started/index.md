@@ -31,16 +31,26 @@ var tokenizer = HuggingFaceBpeTokenizer.FromDirectory("path/to/checkpoint/tokeni
 using var backend = new OnnxDecisionBackend("path/to/checkpoint/model.onnx");
 var engine = new DecisionEngine(tokenizer, backend, maxLen: 1024, headMaxLen: 256);
 
-var answers = await engine.PredictAsync(
+var triage = await engine.PredictAsync(
     "Hi, we were billed twice for March. Please refund the duplicate today.",
-    Presets.TriageQuestions());
+    TriageSchema.Instance);
 
-foreach (var (id, answer) in answers)
-    Console.WriteLine($"{id}: {answer}");
+Console.WriteLine($"{triage.Intent.Choice} (confidence {triage.Intent.Confidence:F2})");
 ```
 
 `maxLen`/`headMaxLen` should match the checkpoint's `config.json` (`1024`/`256` for the
 multilingual checkpoint at the time of writing; `512`/`192` for the English one).
+
+`TriageSchema` is an `IQuestionSchema<TriageResult>` — a fixed question set plus how to bind the
+answers back into a record, so `PredictAsync` returns `TriageResult` directly instead of a
+string-keyed dictionary. It exists because `Presets.TriageQuestions()`'s shape is fixed at compile
+time; a runtime-composed question set (e.g. `Presets.EmailQuestions(myCategories)` with your own
+categories) has no fixed record to bind to and stays on the dictionary path:
+
+```csharp
+var answers = await engine.PredictAsync(state, Presets.EmailQuestions(myCategories));
+var category = answers.Choice("category"); // typed accessor, any question id
+```
 
 ## 3. Route between checkpoints, or shortlist a large label set
 
@@ -55,7 +65,7 @@ using var router = new RouterEngine(
     loader: key => BuildEngineFor(key), // your own: pick a checkpoint dir per ModelKey, build a DecisionEngine
     maxLoaded: 2);
 
-var answers = await router.PredictAsync(stateJson, Presets.TriageQuestions());
+var triage = await router.PredictAsync(stateJson, TriageSchema.Instance);
 ```
 
 For a `choice` question with more labels than fit in the token budget (more than ~20, depending on
