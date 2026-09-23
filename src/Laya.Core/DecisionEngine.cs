@@ -12,11 +12,16 @@ public sealed class DecisionEngine(
 	int maxLen = 512,
 	int headMaxLen = 192,
 	float[]? temperatureByType = null,
-	IReadOnlyDictionary<string, float>? temperatureByOptions = null)
+	IReadOnlyDictionary<string, float>? temperatureByOptions = null) : IDisposable
 {
 	private readonly float[] _temperatureByType = temperatureByType ?? [1f, 1f, 1f];
 	private readonly IReadOnlyDictionary<string, float> _temperatureByOptions =
 		temperatureByOptions ?? new Dictionary<string, float>();
+
+	/// <summary>Disposes the backend this engine owns — <see cref="Routing.RouterEngine"/> relies
+	/// on this to evict/unload cleanly. Don't also separately dispose the same backend instance;
+	/// whether that double-dispose is safe depends on the backend implementation.</summary>
+	public void Dispose() => backend.Dispose();
 
 	public async ValueTask<IReadOnlyDictionary<string, Answer>> PredictAsync(
 		string state,
