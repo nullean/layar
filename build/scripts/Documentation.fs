@@ -13,9 +13,7 @@ open System.Net
 open System.Net.Http
 open System.Text
 open System.Threading.Tasks
-open ProcNet
-
-let private exec binary args = Proc.Exec(binary, List.toArray args) |> ignore
+open Proc.Fs
 
 /// The sub-path GitHub Pages serves this repo from. Empty when the site is hosted at the domain
 /// root (layar.nullean.net). Three files have to agree on it: this one,
@@ -127,10 +125,8 @@ let build () =
     checkPrefixesAgree ()
     let tool = ensureTool ()
 
-    let args =
-        if PathPrefix = "" then ["build"; "--path"; docsSource]
-        else ["build"; "--path"; docsSource; "--path-prefix"; PathPrefix]
-    exec tool args
+    if PathPrefix = "" then shell { sh $"{tool} build --path {docsSource}" }
+    else shell { sh $"{tool} build --path {docsSource} --path-prefix {PathPrefix}" }
 
     if not (Directory.Exists htmlOutput) then
         failwithf "docs-builder reported success but %s does not exist" htmlOutput

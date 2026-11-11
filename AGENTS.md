@@ -20,7 +20,10 @@ mise run docs     # build the docs as CI does, then serve them
 mise run release  # show the release draft; `mise run release publish` releases
 ```
 
-`mise tasks ls` lists them all. Package output and API reports go to `build/output`. A new package needs an entry
+`mise tasks ls` lists them all. The F# build in `build/scripts` runs on
+[Nullean.Make.Fs](https://www.nuget.org/packages/Nullean.Make.Fs) (net11.0): its targets are `target { }` blocks in
+`Program.fs` whose commands are Proc.Fs `sh $"…"` lines, with values from `text`/`lines` inside `shell { }`. Do not call
+the C# `ProcNet` API from the build. Package output and API reports go to `build/output`. A new package needs an entry
 in `Paths.Packages` (`build/scripts/Paths.fs`): its project directory and assembly name differ from its id.
 
 ## Releasing
