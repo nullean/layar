@@ -11,11 +11,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <None Include="..\..\README.md" Pack="true" PackagePath="README.md" />
-    <None Include="..\..\nuget-icon.png" Pack="true" PackagePath="nuget-icon.png" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Layar.Core\Layar.Core.csproj" />
   </ItemGroup>
 
