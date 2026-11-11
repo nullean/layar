@@ -25,11 +25,7 @@ public sealed class RouterEngine : IDisposable
 	private readonly List<ModelKey> _order = []; // least-recently-used first
 	private int _maxLoaded;
 
-	public RouterEngine(
-		ModelLoader loader,
-		int maxLoaded = 1,
-		ModelKey defaultModel = ModelKey.English,
-		bool autoTaskDetection = false)
+	public RouterEngine(ModelLoader loader, int maxLoaded = 1, ModelKey defaultModel = ModelKey.English, bool autoTaskDetection = false)
 	{
 		ArgumentNullException.ThrowIfNull(loader);
 		_loader = loader;
@@ -119,7 +115,8 @@ public sealed class RouterEngine : IDisposable
 		ModelKey? model = null,
 		string? task = null,
 		string? lang = null,
-		CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default
+	)
 	{
 		ArgumentNullException.ThrowIfNull(questions);
 		var decision = _router.Route(state, [.. questions.Keys], model, task, lang);

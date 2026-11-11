@@ -33,14 +33,13 @@ public static class ModelKeys
 	/// <summary>Fixed signatures of the typed-decisions workflows the Python port ships. Matched by
 	/// exact question-id set, never a subset, so an unrelated schema that happens to contain
 	/// "urgency" is never captured.</summary>
-	private static readonly FrozenDictionary<string, FrozenSet<string>> TypedDecisionWorkflows =
-		new Dictionary<string, string[]>
-		{
-			["agent_trace_observability"] = ["action", "needs_review", "outcome", "risk", "urgency"],
-			["customer_service"] = ["action", "category", "churn_risk", "needs_human", "urgency"],
-			["invoice_processing"] = ["discrepancy_severity", "disposition", "duplicate", "matches_order", "urgency"],
-			["security_incidents"] = ["credential_compromise", "disposition", "severity", "true_positive", "urgency"],
-		}.ToFrozenDictionary(kv => kv.Key, kv => kv.Value.ToFrozenSet());
+	private static readonly FrozenDictionary<string, FrozenSet<string>> TypedDecisionWorkflows = new Dictionary<string, string[]>
+	{
+		["agent_trace_observability"] = ["action", "needs_review", "outcome", "risk", "urgency"],
+		["customer_service"] = ["action", "category", "churn_risk", "needs_human", "urgency"],
+		["invoice_processing"] = ["discrepancy_severity", "disposition", "duplicate", "matches_order", "urgency"],
+		["security_incidents"] = ["credential_compromise", "disposition", "severity", "true_positive", "urgency"],
+	}.ToFrozenDictionary(kv => kv.Key, kv => kv.Value.ToFrozenSet());
 
 	public static ModelKey Normalise(string name)
 	{
@@ -48,9 +47,7 @@ public static class ModelKeys
 		var key = name.Trim().ToLowerInvariant();
 		if (ByName.TryGetValue(key, out var model))
 			return model;
-		throw new ArgumentException(
-			$"unknown model '{name}'; choose one of english, multilingual, typed-decisions (or an alias)",
-			nameof(name));
+		throw new ArgumentException($"unknown model '{name}'; choose one of english, multilingual, typed-decisions (or an alias)", nameof(name));
 	}
 
 	public static string ToKeyString(ModelKey key) => key switch

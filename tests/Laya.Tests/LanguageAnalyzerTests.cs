@@ -8,8 +8,7 @@ public class LanguageAnalyzerTests
 	[Test]
 	public async Task English_text_is_detected_as_english()
 	{
-		var result = LanguageAnalyzer.Analyse(
-			"Hi, we were billed twice for March. Please refund the duplicate today or we will cancel our plan.");
+		var result = LanguageAnalyzer.Analyse("Hi, we were billed twice for March. Please refund the duplicate today or we will cancel our plan.");
 		result.Script.Should().Be("latin");
 		result.IsEnglish.Should().BeTrue();
 	}
@@ -46,8 +45,7 @@ public class LanguageAnalyzerTests
 		// margin here, so `Language` stays undecided — but the diacritic rate alone (0.0341) is
 		// enough to say "not safe for the English checkpoint", which is the bit that matters for
 		// routing.
-		var result = LanguageAnalyzer.Analyse(
-			"Ich möchte gerne wissen, ob mein Geld zurückerstattet wird, denn ich bin sehr verärgert.");
+		var result = LanguageAnalyzer.Analyse("Ich möchte gerne wissen, ob mein Geld zurückerstattet wird, denn ich bin sehr verärgert.");
 		result.Script.Should().Be("latin");
 		result.IsEnglish.Should().BeFalse();
 	}

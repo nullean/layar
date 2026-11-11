@@ -25,16 +25,15 @@ public sealed class ModelRouter(ModelKey defaultModel = ModelKey.English, bool a
 		IReadOnlyCollection<string>? questionIds = null,
 		ModelKey? model = null,
 		string? task = null,
-		string? lang = null)
+		string? lang = null
+	)
 	{
 		if (model is { } explicitModel)
 			return new RouteDecision(explicitModel, $"explicit model={ModelKeys.ToKeyString(explicitModel)}", null, null);
 
 		if (task is not null)
 		{
-			var normalizedTask = task.Trim().ToLowerInvariant().Replace('-', '_') == "typed_decisions"
-				? "typed-decisions"
-				: task;
+			var normalizedTask = task.Trim().ToLowerInvariant().Replace('-', '_') == "typed_decisions" ? "typed-decisions" : task;
 			var key = ModelKeys.Normalise(normalizedTask);
 			return new RouteDecision(key, $"explicit task={task}", null, null);
 		}
@@ -42,10 +41,7 @@ public sealed class ModelRouter(ModelKey defaultModel = ModelKey.English, bool a
 		var workflow = questionIds is null ? null : ModelKeys.MatchTypedDecisionsWorkflow(questionIds);
 		if (workflow is not null && AutoTaskDetection)
 		{
-			return new RouteDecision(
-				ModelKey.TypedDecisions,
-				$"question ids match the '{workflow}' typed-decisions workflow",
-				null, workflow);
+			return new RouteDecision(ModelKey.TypedDecisions, $"question ids match the '{workflow}' typed-decisions workflow", null, workflow);
 		}
 
 		if (lang is not null)
@@ -66,16 +62,14 @@ public sealed class ModelRouter(ModelKey defaultModel = ModelKey.English, bool a
 		else if (detection.Script != "latin")
 		{
 			resultKey = ModelKey.Multilingual;
-			reason = $"non-Latin script ({detection.Script}, {detection.NonLatinFraction * 100:0}% of letters); " +
-				"the English checkpoint cannot read it";
+			reason = $"non-Latin script ({detection.Script}, {detection.NonLatinFraction * 100:0}% of letters); " + "the English checkpoint cannot read it";
 		}
 		else if (!detection.IsEnglish)
 		{
 			resultKey = ModelKey.Multilingual;
 			reason = detection.Language is not null
 				? $"Latin script but language looks like '{detection.Language}', not English"
-				: $"Latin script, language not identified but {detection.DiacriticRate * 100:0}% non-English " +
-					"letters; not safe for the English checkpoint";
+				: $"Latin script, language not identified but {detection.DiacriticRate * 100:0}% non-English " + "letters; not safe for the English checkpoint";
 		}
 		else
 		{

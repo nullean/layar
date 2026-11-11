@@ -15,19 +15,14 @@ namespace Laya.Tests;
 /// </summary>
 public class PipelineParityTests
 {
-	private const string State =
-		"{\"body\": \"Hi, we were billed twice for March. Please refund the duplicate today or we will cancel our plan.\"}";
+	private const string State = "{\"body\": \"Hi, we were billed twice for March. Please refund the duplicate today or we will cancel our plan.\"}";
 
 	private static readonly IReadOnlyDictionary<string, Question> Questions = new Dictionary<string, Question>
 	{
 		["department"] = new ChoiceQuestion(
 			"Which department should handle this?",
-			[
-				new("billing", "invoices, payments, refunds"),
-				new("technical", "bugs, outages"),
-				new("sales", "pricing"),
-				new("other", "everything else"),
-			]),
+			[new("billing", "invoices, payments, refunds"), new("technical", "bugs, outages"), new("sales", "pricing"), new("other", "everything else"),]
+		),
 		["urgency"] = new ScoreQuestion("How urgent is this?", ["not urgent", "soon", "critical"]),
 		["churn_risk"] = new NoulQuestion("Does the user threaten to cancel?"),
 	};

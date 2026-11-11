@@ -22,13 +22,7 @@ public static class SequenceBuilder
 		public int[] MarkerPositions { get; } = markerPositions;
 	}
 
-	public static BuiltSequence Build(
-		ITokenizer tokenizer,
-		string state,
-		Question question,
-		int maxLen = 512,
-		int headMaxLen = 192,
-		bool truncateLeft = false)
+	public static BuiltSequence Build(ITokenizer tokenizer, string state, Question question, int maxLen = 512, int headMaxLen = 192, bool truncateLeft = false)
 	{
 		ArgumentNullException.ThrowIfNull(tokenizer);
 		ArgumentNullException.ThrowIfNull(question);

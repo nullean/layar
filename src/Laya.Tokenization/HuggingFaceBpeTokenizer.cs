@@ -20,9 +20,7 @@ public sealed class HuggingFaceBpeTokenizer : ITokenizer
 	/// ships them.</summary>
 	public static HuggingFaceBpeTokenizer FromDirectory(string tokenizerDirectory)
 	{
-		var model = TokenizerLoader.Load(
-			Path.Combine(tokenizerDirectory, "tokenizer.json"),
-			Path.Combine(tokenizerDirectory, "tokenizer_config.json"));
+		var model = TokenizerLoader.Load(Path.Combine(tokenizerDirectory, "tokenizer.json"), Path.Combine(tokenizerDirectory, "tokenizer_config.json"));
 		return new HuggingFaceBpeTokenizer(model);
 	}
 
@@ -115,8 +113,7 @@ public sealed class HuggingFaceBpeTokenizer : ITokenizer
 				continue;
 			}
 
-			throw new InvalidOperationException(
-				$"no vocab entry for symbol '{symbol}' and this tokenizer has neither byte-fallback nor an unk token");
+			throw new InvalidOperationException($"no vocab entry for symbol '{symbol}' and this tokenizer has neither byte-fallback nor an unk token");
 		}
 	}
 

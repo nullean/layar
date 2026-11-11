@@ -13,14 +13,12 @@ public readonly record struct ChoiceOption(string Label, string? Description)
 	/// <summary>Builds an option from a JSON criterion value the way the Python port's
 	/// <c>render_criterion</c> would — see <see cref="CriterionText"/>. Use this when a criterion is
 	/// structured (an object/array) or a bare number/bool rather than a plain string.</summary>
-	public static ChoiceOption FromCriterion(string label, System.Text.Json.JsonElement? criterion) =>
-		new(label, CriterionText.RenderOrNull(criterion));
+	public static ChoiceOption FromCriterion(string label, System.Text.Json.JsonElement? criterion) => new(label, CriterionText.RenderOrNull(criterion));
 
 	/// <summary>Like <see cref="FromCriterion(string, System.Text.Json.JsonElement?)"/>, for a
 	/// criterion built in code with <see cref="System.Text.Json.Nodes.JsonNode"/>/<c>JsonObject</c>
 	/// rather than parsed from external JSON.</summary>
-	public static ChoiceOption FromCriterion(string label, System.Text.Json.Nodes.JsonNode? criterion) =>
-		new(label, CriterionText.RenderOrNull(criterion));
+	public static ChoiceOption FromCriterion(string label, System.Text.Json.Nodes.JsonNode? criterion) => new(label, CriterionText.RenderOrNull(criterion));
 }
 
 /// <summary>
@@ -47,9 +45,7 @@ public sealed record ChoiceQuestion(string Instructions, IReadOnlyList<ChoiceOpt
 		for (var i = 0; i < Options.Count; i++)
 		{
 			var option = Options[i];
-			rendered[i] = string.IsNullOrEmpty(option.Description)
-				? option.Label
-				: $"{option.Label}: {option.Description}";
+			rendered[i] = string.IsNullOrEmpty(option.Description) ? option.Label : $"{option.Label}: {option.Description}";
 		}
 		return rendered;
 	}
@@ -68,14 +64,13 @@ public sealed record ScoreQuestion(string Instructions, IReadOnlyList<string> Le
 	}
 }
 
-public sealed record NoulQuestion(string Instructions, string? TrueDescription = null, string? FalseDescription = null)
-	: Question(Instructions)
+public sealed record NoulQuestion(string Instructions, string? TrueDescription = null, string? FalseDescription = null) : Question(Instructions)
 {
 	public override QuestionType Type => QuestionType.Noul;
 
 	public override IReadOnlyList<string> RenderOptions() =>
-	[
-		"false: " + (string.IsNullOrEmpty(FalseDescription) ? "no, the statement does not hold" : FalseDescription),
-		"true: " + (string.IsNullOrEmpty(TrueDescription) ? "yes, the statement holds" : TrueDescription),
-	];
+		[
+			"false: " + (string.IsNullOrEmpty(FalseDescription) ? "no, the statement does not hold" : FalseDescription),
+			"true: " + (string.IsNullOrEmpty(TrueDescription) ? "yes, the statement holds" : TrueDescription),
+		];
 }

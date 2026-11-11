@@ -37,7 +37,8 @@ public static class Shortlist
 		ChoiceQuestion question,
 		IEmbeddingProvider embeddings,
 		int k = DefaultK,
-		CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default
+	)
 	{
 		ArgumentNullException.ThrowIfNull(stateText);
 		ArgumentNullException.ThrowIfNull(question);
@@ -65,9 +66,7 @@ public static class Shortlist
 			return new Result(allLabels, null, true, n);
 		}
 
-		var queryText = string.IsNullOrEmpty(question.Instructions)
-			? stateText
-			: $"{question.Instructions}\n{stateText}";
+		var queryText = string.IsNullOrEmpty(question.Instructions) ? stateText : $"{question.Instructions}\n{stateText}";
 
 		var optionTexts = question.RenderOptions();
 		var texts = new string[n + 1];
@@ -78,8 +77,7 @@ public static class Shortlist
 		var vectors = await embeddings.EmbedBatchAsync(texts, cancellationToken).ConfigureAwait(false);
 		if (vectors.Length != texts.Length)
 		{
-			throw new InvalidOperationException(
-				$"embedding provider returned {vectors.Length} vectors for {texts.Length} texts");
+			throw new InvalidOperationException($"embedding provider returned {vectors.Length} vectors for {texts.Length} texts");
 		}
 
 		var query = Sanitized(vectors[0]);

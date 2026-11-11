@@ -12,11 +12,11 @@ public sealed class DecisionEngine(
 	int maxLen = 512,
 	int headMaxLen = 192,
 	float[]? temperatureByType = null,
-	IReadOnlyDictionary<string, float>? temperatureByOptions = null) : IDisposable
+	IReadOnlyDictionary<string, float>? temperatureByOptions = null
+) : IDisposable
 {
 	private readonly float[] _temperatureByType = temperatureByType ?? [1f, 1f, 1f];
-	private readonly IReadOnlyDictionary<string, float> _temperatureByOptions =
-		temperatureByOptions ?? new Dictionary<string, float>();
+	private readonly IReadOnlyDictionary<string, float> _temperatureByOptions = temperatureByOptions ?? new Dictionary<string, float>();
 
 	/// <summary>Disposes the backend this engine owns — <see cref="Routing.RouterEngine"/> relies
 	/// on this to evict/unload cleanly. Don't also separately dispose the same backend instance;
@@ -26,7 +26,8 @@ public sealed class DecisionEngine(
 	public async ValueTask<IReadOnlyDictionary<string, Answer>> PredictAsync(
 		string state,
 		IReadOnlyDictionary<string, Question> questions,
-		CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default
+	)
 	{
 		var ids = questions.Keys.ToArray();
 		var sequences = new SequenceBuilder.BuiltSequence[ids.Length];
@@ -46,9 +47,7 @@ public sealed class DecisionEngine(
 			var question = questions[ids[r]];
 			var k = sequences[r].MarkerPositions.Length;
 			var bucket = ProbabilityMath.TemperatureBucket(question.Type, k);
-			var temperature = _temperatureByOptions.TryGetValue(bucket, out var t)
-				? t
-				: _temperatureByType[(int)question.Type];
+			var temperature = _temperatureByOptions.TryGetValue(bucket, out var t) ? t : _temperatureByType[(int)question.Type];
 
 			var logitsRow = output.Logits.AsSpan(r * output.MarkerCapacity, output.MarkerCapacity);
 			var probs = new float[k];

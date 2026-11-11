@@ -53,8 +53,7 @@ public sealed class TorchSharpDecisionBackend : IDecisionBackend
 		return torch.tensor(longs, dtype: dtype).reshape(rows, cols);
 	}
 
-	private static Tensor ToBoolTensor(bool[] source, int rows, int cols) =>
-		torch.tensor(source).reshape(rows, cols);
+	private static Tensor ToBoolTensor(bool[] source, int rows, int cols) => torch.tensor(source).reshape(rows, cols);
 
 	private static float[] TensorToFloatArray(Tensor tensor)
 	{

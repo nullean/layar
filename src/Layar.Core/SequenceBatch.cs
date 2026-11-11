@@ -8,10 +8,7 @@ namespace Laya.Core;
 /// </summary>
 public static class SequenceBatch
 {
-	public static DecisionRequest Collate(
-		IReadOnlyList<SequenceBuilder.BuiltSequence> sequences,
-		IReadOnlyList<QuestionType> questionTypes,
-		int padTokenId)
+	public static DecisionRequest Collate(IReadOnlyList<SequenceBuilder.BuiltSequence> sequences, IReadOnlyList<QuestionType> questionTypes, int padTokenId)
 	{
 		ArgumentNullException.ThrowIfNull(sequences);
 		ArgumentNullException.ThrowIfNull(questionTypes);

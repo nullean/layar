@@ -8,39 +8,49 @@ namespace Laya.Core;
 /// </summary>
 public static class PresetResults
 {
-	public static TriageResult AsTriage(this IReadOnlyDictionary<string, Answer> answers) => new(
-		Intent: answers.Choice("intent"),
-		IsUrgent: answers.Noul("is_urgent"),
-		Frustration: answers.Score("frustration"),
-		RefundRequested: answers.Noul("refund_requested"),
-		ChurnRisk: answers.Noul("churn_risk"));
+	public static TriageResult AsTriage(this IReadOnlyDictionary<string, Answer> answers) =>
+		new(
+			Intent: answers.Choice("intent"),
+			IsUrgent: answers.Noul("is_urgent"),
+			Frustration: answers.Score("frustration"),
+			RefundRequested: answers.Noul("refund_requested"),
+			ChurnRisk: answers.Noul("churn_risk")
+		);
 
-	public static EmailTriageResult AsEmailTriage(this IReadOnlyDictionary<string, Answer> answers) => new(
-		Category: answers.Choice("category"),
-		IsSpam: answers.Noul("is_spam"),
-		IsPhishing: answers.Noul("is_phishing"),
-		Urgency: answers.Score("urgency"),
-		NeedsReply: answers.Noul("needs_reply"));
+	public static EmailTriageResult AsEmailTriage(this IReadOnlyDictionary<string, Answer> answers) =>
+		new(
+			Category: answers.Choice("category"),
+			IsSpam: answers.Noul("is_spam"),
+			IsPhishing: answers.Noul("is_phishing"),
+			Urgency: answers.Score("urgency"),
+			NeedsReply: answers.Noul("needs_reply")
+		);
 
-	public static GuardResult AsGuard(this IReadOnlyDictionary<string, Answer> answers) => new(
-		Jailbreak: answers.Noul("jailbreak"),
-		PromptInjection: answers.Noul("prompt_injection"),
-		SensitiveData: answers.Noul("sensitive_data"),
-		HarmSeverity: answers.Score("harm_severity"),
-		Topic: answers.Choice("topic"));
+	public static GuardResult AsGuard(this IReadOnlyDictionary<string, Answer> answers) =>
+		new(
+			Jailbreak: answers.Noul("jailbreak"),
+			PromptInjection: answers.Noul("prompt_injection"),
+			SensitiveData: answers.Noul("sensitive_data"),
+			HarmSeverity: answers.Score("harm_severity"),
+			Topic: answers.Choice("topic")
+		);
 
-	public static ModerationResult AsModeration(this IReadOnlyDictionary<string, Answer> answers) => new(
-		Toxic: answers.Noul("toxic"),
-		Harassment: answers.Noul("harassment"),
-		Threat: answers.Noul("threat"),
-		Spam: answers.Noul("spam"),
-		Severity: answers.Score("severity"));
+	public static ModerationResult AsModeration(this IReadOnlyDictionary<string, Answer> answers) =>
+		new(
+			Toxic: answers.Noul("toxic"),
+			Harassment: answers.Noul("harassment"),
+			Threat: answers.Noul("threat"),
+			Spam: answers.Noul("spam"),
+			Severity: answers.Score("severity")
+		);
 
-	public static ModelRouterResult AsModelRouting(this IReadOnlyDictionary<string, Answer> answers) => new(
-		Difficulty: answers.Score("difficulty"),
-		Domain: answers.Choice("domain"),
-		NeedsTools: answers.Noul("needs_tools"),
-		IsSensitive: answers.Noul("is_sensitive"));
+	public static ModelRouterResult AsModelRouting(this IReadOnlyDictionary<string, Answer> answers) =>
+		new(
+			Difficulty: answers.Score("difficulty"),
+			Domain: answers.Choice("domain"),
+			NeedsTools: answers.Noul("needs_tools"),
+			IsSensitive: answers.Noul("is_sensitive")
+		);
 }
 
 /// <summary>Typed result of <see cref="Presets.TriageQuestions"/>.</summary>
