@@ -96,7 +96,7 @@ README, "Can I version multiple projects in a single repository independently?")
 
 | Tag | Triggers | Versions |
 |---|---|---|
-| `v<major.minor.patch>`, e.g. `v0.2.0` | `.github/workflows/ci.yml` | `Layar`, `Layar.Tokenization`, `Layar.Onnx`, `Layar.TorchSharp`, `Layar.Cli` and the meta-packages (`MinVerTagPrefix` is `v`) |
+| `v<major.minor.patch>`, e.g. `v0.2.0`, created by publishing the release-drafter draft | the `release` job in `.github/workflows/ci.yml` | `Layar`, `Layar.Tokenization`, `Layar.Onnx`, `Layar.TorchSharp`, `Layar.Cli` and the meta-packages (`MinVerTagPrefix` is `v`) |
 | `models-<major.minor.patch>`, e.g. `models-1.0.0` | `.github/workflows/release-models.yml` | The three checkpoints (english, multilingual, typed-decisions), exported fresh and uploaded as flat GitHub Release assets |
 
 ## Measured
@@ -117,8 +117,8 @@ for what was tried.
 ## Building
 
 ```bash
-dotnet build layar.slnx
-dotnet run --project tests/Laya.Tests/Laya.Tests.csproj -c Release
+mise run build
+mise run test
 ```
 
 TorchSharp's native `libtorch` needs `DYLD_LIBRARY_PATH`/`LD_LIBRARY_PATH` pointed at the
