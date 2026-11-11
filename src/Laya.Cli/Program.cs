@@ -24,13 +24,16 @@ switch (command)
 		return 1;
 }
 
-static void PrintUsage() => Console.WriteLine("""
+static void PrintUsage() =>
+	Console.WriteLine(
+		"""
 	layar predict --model <dir> --backend onnx|torchsharp --state <text>
 	layar benchmark --model <dir> --state <text> [--iterations N]
 
 	<dir> is a directory produced by tools/layar-export (containing model.onnx,
 	model.pt, tokenizer/, config.json).
-	""");
+	"""
+	);
 
 static string RequireOption(string[] args, string name)
 {
@@ -114,7 +117,12 @@ static async Task<int> RunBenchmark(string[] args)
 }
 
 static async Task<IReadOnlyDictionary<string, Answer>> Time(
-	string name, DecisionEngine engine, string state, IReadOnlyDictionary<string, Question> questions, int iterations)
+	string name,
+	DecisionEngine engine,
+	string state,
+	IReadOnlyDictionary<string, Question> questions,
+	int iterations
+)
 {
 	var answers = await engine.PredictAsync(state, questions); // warmup + result to compare
 	var sw = Stopwatch.StartNew();

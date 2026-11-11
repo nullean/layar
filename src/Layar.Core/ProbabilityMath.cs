@@ -55,11 +55,7 @@ public static class ProbabilityMath
 	/// <paramref name="temperature"/>, subtracts the max for numerical stability, then normalizes.
 	/// <paramref name="destination"/> may alias <paramref name="logits"/>.
 	/// </summary>
-	public static void SoftmaxWithTemperature(
-		ReadOnlySpan<float> logits,
-		int optionCount,
-		float temperature,
-		Span<float> destination)
+	public static void SoftmaxWithTemperature(ReadOnlySpan<float> logits, int optionCount, float temperature, Span<float> destination)
 	{
 		var z = logits[..optionCount];
 		var dest = destination[..optionCount];

@@ -15,7 +15,7 @@ public static class GitHubReleaseCheckpointUrls
 		ArgumentException.ThrowIfNullOrEmpty(tag);
 
 		return (checkpointName, relativePath) => new Uri(
-			$"https://github.com/{owner}/{repository}/releases/download/{tag}/" +
-			$"{checkpointName}-{relativePath.Replace('/', '-')}");
+			$"https://github.com/{owner}/{repository}/releases/download/{tag}/" + $"{checkpointName}-{relativePath.Replace('/', '-')}"
+		);
 	}
 }

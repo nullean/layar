@@ -12,7 +12,8 @@ public readonly record struct LanguageAnalysis(
 	bool IsEnglish,
 	bool LanguageUndecided,
 	double DiacriticRate,
-	double NonLatinFraction);
+	double NonLatinFraction
+);
 
 /// <summary>
 /// Decides whether a state's text can be trusted to the English checkpoint or needs the
@@ -61,9 +62,7 @@ public static class LanguageAnalyzer
 	{
 		var script = ScriptDetector.DetectScript(text);
 		var profile = ScriptDetector.ScriptProfile(text);
-		var nonLatinFraction = profile.Count == 0
-			? 0.0
-			: Math.Round(1.0 - profile.GetValueOrDefault("latin", 0.0), 4);
+		var nonLatinFraction = profile.Count == 0 ? 0.0 : Math.Round(1.0 - profile.GetValueOrDefault("latin", 0.0), 4);
 
 		if (script == "unknown")
 			return new LanguageAnalysis("unknown", profile, null, true, true, 0.0, 0.0);
@@ -76,9 +75,7 @@ public static class LanguageAnalyzer
 		// this port holds no stopwords for to the checkpoint that cannot read it, silently.
 		var undecided = latin.Language is null;
 		var isEnglish = latin.Language == "en" || (undecided && !latin.LooksNonEnglish);
-		return new LanguageAnalysis(
-			"latin", profile, latin.Language, isEnglish, undecided,
-			Math.Round(latin.DiacriticRate, 4), nonLatinFraction);
+		return new LanguageAnalysis("latin", profile, latin.Language, isEnglish, undecided, Math.Round(latin.DiacriticRate, 4), nonLatinFraction);
 	}
 
 	public static bool IsEnglish(ReadOnlySpan<char> text) => Analyse(text).IsEnglish;

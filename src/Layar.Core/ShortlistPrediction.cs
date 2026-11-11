@@ -12,14 +12,14 @@ public static class ShortlistPrediction
 	/// <see cref="DecisionEngine.PredictAsync"/> call. The engine's own probabilities/confidence
 	/// on a shortlisted choice are over the kept labels only.
 	/// </summary>
-	public static async ValueTask<(IReadOnlyDictionary<string, Answer> Answers, IReadOnlyDictionary<string, Shortlist.Result> Shortlists)>
-		PredictShortlistAsync(
-			this DecisionEngine engine,
-			string stateText,
-			IReadOnlyDictionary<string, Question> questions,
-			IEmbeddingProvider embeddings,
-			int k = Shortlist.DefaultK,
-			CancellationToken cancellationToken = default)
+	public static async ValueTask<(IReadOnlyDictionary<string, Answer> Answers, IReadOnlyDictionary<string, Shortlist.Result> Shortlists)> PredictShortlistAsync(
+		this DecisionEngine engine,
+		string stateText,
+		IReadOnlyDictionary<string, Question> questions,
+		IEmbeddingProvider embeddings,
+		int k = Shortlist.DefaultK,
+		CancellationToken cancellationToken = default
+	)
 	{
 		ArgumentNullException.ThrowIfNull(engine);
 		ArgumentNullException.ThrowIfNull(questions);

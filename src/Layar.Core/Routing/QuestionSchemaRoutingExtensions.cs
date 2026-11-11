@@ -13,7 +13,8 @@ public static class RouterEngineQuestionSchemaExtensions
 		ModelKey? model = null,
 		string? task = null,
 		string? lang = null,
-		CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default
+	)
 	{
 		ArgumentNullException.ThrowIfNull(router);
 		ArgumentNullException.ThrowIfNull(schema);

@@ -8,9 +8,7 @@ namespace Laya.Tokenization;
 /// targets).</summary>
 internal static partial class Gpt2PreTokenizer
 {
-	[GeneratedRegex(
-		"'s|'t|'re|'ve|'m|'ll|'d| ?\\p{L}+| ?\\p{N}+| ?[^\\s\\p{L}\\p{N}]+|\\s+(?!\\S)|\\s+",
-		RegexOptions.None, matchTimeoutMilliseconds: 2000)]
+	[GeneratedRegex("'s|'t|'re|'ve|'m|'ll|'d| ?\\p{L}+| ?\\p{N}+| ?[^\\s\\p{L}\\p{N}]+|\\s+(?!\\S)|\\s+", RegexOptions.None, matchTimeoutMilliseconds: 2000)]
 	private static partial Regex Pattern();
 
 	public static List<string> Split(string text)

@@ -24,7 +24,8 @@ public class RouterEngineTests
 				backends[key] = backend;
 				return new DecisionEngine(new FakeTokenizer(), backend);
 			},
-			maxLoaded: maxLoaded);
+			maxLoaded: maxLoaded
+		);
 		return (router, backends);
 	}
 
@@ -100,8 +101,7 @@ public class RouterEngineTests
 	public async Task PredictAsync_honors_an_explicit_model_override()
 	{
 		var (router, _) = MakeRouter(maxLoaded: 2);
-		var answers = await router.PredictAsync(
-			State("Please refund my duplicate charge."), Questions, model: ModelKey.Multilingual);
+		var answers = await router.PredictAsync(State("Please refund my duplicate charge."), Questions, model: ModelKey.Multilingual);
 
 		answers.Should().ContainKey("intent");
 		router.Loaded.Should().Equal(ModelKey.Multilingual);

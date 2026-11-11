@@ -64,11 +64,7 @@ public class CriterionTextTests
 	{
 		// Built in code with JsonObject/JsonArray (the mutable DOM Email.cs already uses), not
 		// parsed from external JSON text.
-		var node = new JsonObject
-		{
-			["keywords"] = new JsonArray("asap", "now"),
-			["weight"] = 2,
-		};
+		var node = new JsonObject { ["keywords"] = new JsonArray("asap", "now"), ["weight"] = 2, };
 		var option = ChoiceOption.FromCriterion("urgent", node);
 		option.Description.Should().Be("""{"keywords": ["asap", "now"], "weight": 2}""");
 	}

@@ -33,10 +33,7 @@ public class AnswerErgonomicsTests
 	[Test]
 	public async Task Wrong_type_throws_a_clear_InvalidCastException_naming_both_types()
 	{
-		var answers = new Dictionary<string, Answer>
-		{
-			["churn_risk"] = new NoulAnswer(0.2f, 0.8f, NoAction),
-		};
+		var answers = new Dictionary<string, Answer> { ["churn_risk"] = new NoulAnswer(0.2f, 0.8f, NoAction), };
 		var act = () => answers.Choice("churn_risk");
 		act.Should().Throw<InvalidCastException>().WithMessage("*churn_risk*NoulAnswer*ChoiceAnswer*");
 	}

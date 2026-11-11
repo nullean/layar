@@ -11,11 +11,7 @@ public sealed record EmailState(string Subject, string Body, string? From, IRead
 	/// serializer, so this stays reflection-free under trimming/NativeAOT).</summary>
 	public string ToStateText()
 	{
-		var obj = new JsonObject
-		{
-			["subject"] = Subject,
-			["body"] = Body,
-		};
+		var obj = new JsonObject { ["subject"] = Subject, ["body"] = Body, };
 		if (From is not null)
 			obj["from"] = From;
 		if (Extra is not null)
@@ -47,17 +43,14 @@ public static partial class Email
 	[GeneratedRegex(@"^\s*--\s*$", RegexOptions.None, matchTimeoutMilliseconds: 2000)]
 	private static partial Regex SignatureDashes();
 
-	[GeneratedRegex(@"^\s*(best|kind|warm|many thanks|thanks|thank you|regards|cheers|sincerely)[\w ,!.]*$",
-		RegexOptions.IgnoreCase, matchTimeoutMilliseconds: 2000)]
+	[GeneratedRegex(@"^\s*(best|kind|warm|many thanks|thanks|thank you|regards|cheers|sincerely)[\w ,!.]*$", RegexOptions.IgnoreCase, matchTimeoutMilliseconds: 2000)]
 	private static partial Regex SignatureClosing();
 
 	[GeneratedRegex(@"^\s*sent from my (iphone|android|mobile|ipad)", RegexOptions.IgnoreCase, matchTimeoutMilliseconds: 2000)]
 	private static partial Regex SignatureSentFrom();
 
-	[GeneratedRegex(
-		"(confidential|intended (solely )?for the (use of the )?(named )?(addressee|recipient)|" +
-		"if you (have )?received this (e-?mail|message) in error)",
-		RegexOptions.IgnoreCase, matchTimeoutMilliseconds: 2000)]
+	[GeneratedRegex("(confidential|intended (solely )?for the (use of the )?(named )?(addressee|recipient)|" +
+		"if you (have )?received this (e-?mail|message) in error)", RegexOptions.IgnoreCase, matchTimeoutMilliseconds: 2000)]
 	private static partial Regex Disclaimer();
 
 	[GeneratedRegex(@"(?<=[.!?])\s+", RegexOptions.None, matchTimeoutMilliseconds: 2000)]
@@ -70,24 +63,19 @@ public static partial class Email
 	private static partial Regex RunsOfSpaces();
 
 	private static bool IsQuoteHeader(string line) =>
-		QuoteHeaderOnWrote().IsMatch(line) ||
-		QuoteHeaderOriginalForwarded().IsMatch(line) ||
-		QuoteHeaderUnderscores().IsMatch(line) ||
-		QuoteHeaderFrom().IsMatch(line);
+		QuoteHeaderOnWrote().IsMatch(line) || QuoteHeaderOriginalForwarded().IsMatch(line) || QuoteHeaderUnderscores().IsMatch(
+			line
+		) || QuoteHeaderFrom().IsMatch(line);
 
 	private static bool IsSignatureMarker(string line) =>
-		SignatureDashes().IsMatch(line) ||
-		SignatureClosing().IsMatch(line) ||
-		SignatureSentFrom().IsMatch(line);
+		SignatureDashes().IsMatch(line) || SignatureClosing().IsMatch(line) || SignatureSentFrom().IsMatch(line);
 
 	private static string StripDisclaimer(string paragraph)
 	{
 		if (!Disclaimer().IsMatch(paragraph))
 			return paragraph;
 
-		var parts = SentenceBoundary().Split(paragraph)
-			.Select(p => p.Trim())
-			.Where(p => p.Length > 0);
+		var parts = SentenceBoundary().Split(paragraph).Select(p => p.Trim()).Where(p => p.Length > 0);
 		var kept = parts.Where(p => !Disclaimer().IsMatch(p));
 		return string.Join(' ', kept);
 	}
@@ -96,10 +84,7 @@ public static partial class Email
 	/// sees the sender's actual request rather than boilerplate.</summary>
 	public static string CleanBody(string? body, int maxChars = 3000)
 	{
-		var text = (body ?? string.Empty)
-			.Replace("\r\n", "\n")
-			.Replace("\r", "\n")
-			.Replace("\\n", "\n");
+		var text = (body ?? string.Empty).Replace("\r\n", "\n").Replace("\r", "\n").Replace("\\n", "\n");
 
 		var rawLines = text.Split('\n');
 		var lines = new List<string>();
@@ -125,10 +110,7 @@ public static partial class Email
 		lines = lines[..cut];
 
 		var joined = string.Join('\n', lines);
-		var paragraphs = ParagraphBoundary().Split(joined)
-			.Select(StripDisclaimer)
-			.Select(p => p.Trim())
-			.Where(p => p.Length > 0);
+		var paragraphs = ParagraphBoundary().Split(joined).Select(StripDisclaimer).Select(p => p.Trim()).Where(p => p.Length > 0);
 
 		var result = RunsOfSpaces().Replace(string.Join("\n\n", paragraphs), " ");
 		return result.Length <= maxChars ? result : result[..maxChars];
@@ -141,10 +123,6 @@ public static partial class Email
 		string? body,
 		string? sender = null,
 		bool clean = true,
-		IReadOnlyDictionary<string, string>? extra = null) =>
-		new(
-			(subject ?? string.Empty).Trim(),
-			clean ? CleanBody(body) : body ?? string.Empty,
-			sender,
-			extra);
+		IReadOnlyDictionary<string, string>? extra = null
+	) => new((subject ?? string.Empty).Trim(), clean ? CleanBody(body) : body ?? string.Empty, sender, extra);
 }

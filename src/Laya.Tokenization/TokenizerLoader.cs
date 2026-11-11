@@ -60,11 +60,10 @@ internal static class TokenizerLoader
 			"ByteLevel" => PreTokenizerKind.ByteLevel,
 			_ => throw new NotSupportedException($"tokenizer.json pre_tokenizer type '{preTokenizerType}' is not supported"),
 		};
-		var replacement = kind == PreTokenizerKind.Metaspace
-			? preTokenizerElement.GetProperty("replacement").GetString()![0]
-			: '▁';
+		var replacement = kind == PreTokenizerKind.Metaspace ? preTokenizerElement.GetProperty("replacement").GetString()![0] : '▁';
 
 		string SpecialToken(string configKey) => configDoc.RootElement.GetProperty(configKey).GetString()!;
+
 		int SpecialTokenId(string configKey) => vocab[SpecialToken(configKey)];
 
 		return new TokenizerModel

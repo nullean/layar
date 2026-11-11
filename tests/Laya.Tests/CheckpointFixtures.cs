@@ -25,8 +25,7 @@ internal static class CheckpointFixtures
 		return null;
 	}
 
-	public static string? ModelDirectory(string checkpointName) =>
-		RepoRoot is null ? null : Path.Combine(RepoRoot, ".artifacts", "models", checkpointName);
+	public static string? ModelDirectory(string checkpointName) => RepoRoot is null ? null : Path.Combine(RepoRoot, ".artifacts", "models", checkpointName);
 
 	/// <summary>Returns the checkpoint directory, or throws <see cref="TUnit.Core.Exceptions.SkipTestException"/>
 	/// when it hasn't been exported locally.</summary>
@@ -37,7 +36,8 @@ internal static class CheckpointFixtures
 		{
 			throw new TUnit.Core.Exceptions.SkipTestException(
 				$"'{checkpointName}' checkpoint not exported locally — run tools/layar-export/export.py " +
-				$"and populate .artifacts/models/{checkpointName} to run this test.");
+					$"and populate .artifacts/models/{checkpointName} to run this test."
+			);
 		}
 		return dir;
 	}

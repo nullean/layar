@@ -18,10 +18,7 @@ internal sealed class StubHttpMessageHandler(IReadOnlyDictionary<string, string>
 		var url = request.RequestUri!.ToString();
 		if (contentByUrl.TryGetValue(url, out var content))
 		{
-			return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK)
-			{
-				Content = new StringContent(content),
-			});
+			return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = new StringContent(content), });
 		}
 		return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound));
 	}
@@ -33,8 +30,7 @@ public class CheckpointCacheTests
 
 	// Real GitHubReleaseCheckpointUrls.Create, just pointed at a fake owner/repo/tag so the URLs
 	// stay stable test fixtures without depending on an actual GitHub release existing.
-	private static CheckpointAssetUrl FlatGitHubReleaseStyle() =>
-		GitHubReleaseCheckpointUrls.Create("example", "example-repo", "v0.0.0-test");
+	private static CheckpointAssetUrl FlatGitHubReleaseStyle() => GitHubReleaseCheckpointUrls.Create("example", "example-repo", "v0.0.0-test");
 
 	[Test]
 	public async Task EnsureFileAsync_downloads_and_writes_to_the_expected_local_path()
@@ -88,8 +84,11 @@ public class CheckpointCacheTests
 	public async Task TryEnsureFileAsync_returns_null_on_404_instead_of_throwing()
 	{
 		var cacheRoot = TempDir();
-		using var cache = new CheckpointCache(cacheRoot, FlatGitHubReleaseStyle(), new HttpClient(new StubHttpMessageHandler(
-			new Dictionary<string, string>())));
+		using var cache = new CheckpointCache(
+			cacheRoot,
+			FlatGitHubReleaseStyle(),
+			new HttpClient(new StubHttpMessageHandler(new Dictionary<string, string>()))
+		);
 
 		var result = await cache.TryEnsureFileAsync("multilingual", "model.onnx.data");
 
@@ -100,8 +99,11 @@ public class CheckpointCacheTests
 	public async Task EnsureFileAsync_throws_on_404_for_a_required_file()
 	{
 		var cacheRoot = TempDir();
-		using var cache = new CheckpointCache(cacheRoot, FlatGitHubReleaseStyle(), new HttpClient(new StubHttpMessageHandler(
-			new Dictionary<string, string>())));
+		using var cache = new CheckpointCache(
+			cacheRoot,
+			FlatGitHubReleaseStyle(),
+			new HttpClient(new StubHttpMessageHandler(new Dictionary<string, string>()))
+		);
 
 		var act = () => cache.EnsureFileAsync("multilingual", "model.onnx");
 		await act.Should().ThrowAsync<HttpRequestException>();
@@ -150,15 +152,15 @@ public class GitHubReleaseCheckpointUrlsTests
 	public async Task Create_flattens_a_nested_relative_path_into_a_single_asset_name()
 	{
 		var urlOf = GitHubReleaseCheckpointUrls.Create("nullean", "layar", "0.1.0");
-		urlOf("multilingual", "tokenizer/tokenizer.json").Should().Be(new Uri(
-			"https://github.com/nullean/layar/releases/download/0.1.0/multilingual-tokenizer-tokenizer.json"));
+		urlOf("multilingual", "tokenizer/tokenizer.json")
+			.Should()
+			.Be(new Uri("https://github.com/nullean/layar/releases/download/0.1.0/multilingual-tokenizer-tokenizer.json"));
 	}
 
 	[Test]
 	public async Task Create_handles_a_top_level_file_without_a_slash()
 	{
 		var urlOf = GitHubReleaseCheckpointUrls.Create("nullean", "layar", "0.1.0");
-		urlOf("english", "model.onnx").Should().Be(new Uri(
-			"https://github.com/nullean/layar/releases/download/0.1.0/english-model.onnx"));
+		urlOf("english", "model.onnx").Should().Be(new Uri("https://github.com/nullean/layar/releases/download/0.1.0/english-model.onnx"));
 	}
 }

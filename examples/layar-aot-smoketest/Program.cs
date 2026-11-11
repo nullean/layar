@@ -31,15 +31,10 @@ Check("confidence is 1.0 for a certain answer", MathF.Abs(confidence - 1f) < 1e-
 
 // Sequence building against a fake tokenizer (no external files needed for this smoketest)
 var tokenizer = new SmoketestTokenizer();
-var question = new ChoiceQuestion("Which department should handle this?",
-[
-	new("billing", "invoices, payments"),
-	new("technical", "bugs, outages"),
-]);
+var question = new ChoiceQuestion("Which department should handle this?", [new("billing", "invoices, payments"), new("technical", "bugs, outages"),]);
 var sequence = SequenceBuilder.Build(tokenizer, "the customer wants a refund", question, maxLen: 128, headMaxLen: 64);
 Check("sequence has one marker per option", sequence.MarkerPositions.Length == 2);
-Check("sequence starts with CLS and ends with SEP",
-	sequence.TokenIds[0] == tokenizer.ClsTokenId && sequence.TokenIds[^1] == tokenizer.SepTokenId);
+Check("sequence starts with CLS and ends with SEP", sequence.TokenIds[0] == tokenizer.ClsTokenId && sequence.TokenIds[^1] == tokenizer.SepTokenId);
 
 // Presets and Email are pure data/text ports; check they at least construct.
 var triage = Presets.TriageQuestions();

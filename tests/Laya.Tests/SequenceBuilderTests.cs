@@ -7,11 +7,8 @@ public class SequenceBuilderTests
 {
 	private static readonly ChoiceQuestion Choice = new(
 		"Which department should handle this?",
-		[
-			new("billing", "invoices, payments"),
-			new("technical", "bugs, outages"),
-			new("other", null),
-		]);
+		[new("billing", "invoices, payments"), new("technical", "bugs, outages"), new("other", null),]
+	);
 
 	[Test]
 	public async Task Build_produces_one_marker_per_option()
@@ -54,7 +51,8 @@ public class SequenceBuilderTests
 		var tok = new FakeTokenizer();
 		var manyOptions = new ChoiceQuestion(
 			"pick one",
-			Enumerable.Range(0, 20).Select(i => new ChoiceOption($"option_{i}", "a fairly long description of this option")).ToArray());
+			Enumerable.Range(0, 20).Select(i => new ChoiceOption($"option_{i}", "a fairly long description of this option")).ToArray()
+		);
 		var seq = SequenceBuilder.Build(tok, "state text", manyOptions, maxLen: 256, headMaxLen: 64);
 		seq.MarkerPositions.Should().HaveCount(20);
 	}

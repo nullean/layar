@@ -5,8 +5,7 @@ namespace Laya.Tests;
 
 public class ShortlistTests
 {
-	private static ChoiceQuestion Question(params string[] labels) =>
-		new("", labels.Select(l => new ChoiceOption(l, null)).ToArray());
+	private static ChoiceQuestion Question(params string[] labels) => new("", labels.Select(l => new ChoiceOption(l, null)).ToArray());
 
 	[Test]
 	public async Task Passthrough_when_k_is_at_least_the_option_count_and_never_calls_the_provider()
@@ -67,13 +66,7 @@ public class ShortlistTests
 	public async Task Zero_query_vector_scores_everything_zero_and_keeps_original_order()
 	{
 		var question = Question("a", "b", "c");
-		var provider = new FakeEmbeddingProvider(new Dictionary<string, float[]>
-		{
-			["q"] = [0f, 0f],
-			["a"] = [1f, 0f],
-			["b"] = [0f, 1f],
-			["c"] = [1f, 1f],
-		});
+		var provider = new FakeEmbeddingProvider(new Dictionary<string, float[]> { ["q"] = [0f, 0f], ["a"] = [1f, 0f], ["b"] = [0f, 1f], ["c"] = [1f, 1f], });
 
 		var result = await Shortlist.RankChoiceAsync("q", question, provider, k: 2);
 
@@ -102,12 +95,7 @@ public class ShortlistTests
 	public async Task Instructions_are_prefixed_onto_the_query_text()
 	{
 		var question = new ChoiceQuestion("classify this", [new("a", null), new("b", null)]);
-		var provider = new FakeEmbeddingProvider(new Dictionary<string, float[]>
-		{
-			["classify this\nstate"] = [1f, 0f],
-			["a"] = [1f, 0f],
-			["b"] = [0f, 1f],
-		});
+		var provider = new FakeEmbeddingProvider(new Dictionary<string, float[]> { ["classify this\nstate"] = [1f, 0f], ["a"] = [1f, 0f], ["b"] = [0f, 1f], });
 
 		var result = await Shortlist.RankChoiceAsync("state", question, provider, k: 1);
 

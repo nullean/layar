@@ -30,7 +30,8 @@ public static class QuestionSchemaExtensions
 		this DecisionEngine engine,
 		string state,
 		IQuestionSchema<TResult> schema,
-		CancellationToken cancellationToken = default)
+		CancellationToken cancellationToken = default
+	)
 	{
 		ArgumentNullException.ThrowIfNull(engine);
 		ArgumentNullException.ThrowIfNull(schema);

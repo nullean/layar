@@ -14,19 +14,15 @@ public sealed record DecisionRequest(
 	int[] QuestionTypes,
 	int BatchSize,
 	int SequenceLength,
-	int MarkerCapacity);
+	int MarkerCapacity
+);
 
 /// <summary>
 /// A backend's raw output for a <see cref="DecisionRequest"/>: per-marker logits (masked
 /// positions carry an arbitrary large-negative value, matching the model's own masking) and the
 /// action head's raw logits. <see cref="ProbabilityMath"/> turns these into calibrated answers.
 /// </summary>
-public sealed record DecisionOutput(
-	float[] Logits,
-	float[] ActionLogits,
-	int BatchSize,
-	int MarkerCapacity,
-	int ActionClassCount);
+public sealed record DecisionOutput(float[] Logits, float[] ActionLogits, int BatchSize, int MarkerCapacity, int ActionClassCount);
 
 /// <summary>
 /// Runs the decision model's forward pass. Implemented by <c>Laya.Onnx</c> (ONNX Runtime) and
