@@ -15,7 +15,8 @@ mise run build    # build the solution
 mise run test     # build, then run the tests (TUnit, via dotnet run)
 mise run pack     # build, pack, validate the packages, report public API changes
 mise run ci       # exactly what CI runs: test, then pack
-mise run check    # workflow security checks (zizmor)
+mise run format   # format the repository with curb
+mise run check    # formatting drift (curb) and workflow security checks (zizmor); CI runs the curb half
 mise run docs     # build the docs as CI does, then serve them
 mise run release  # show the release draft; `mise run release publish` releases
 ```
