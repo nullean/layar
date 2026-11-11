@@ -30,10 +30,10 @@
   </ItemGroup>
   <ItemGroup>
     <!-- Build script dependencies -->
-    <PackageVersion Include="FSharp.Core" Version="10.0.100" />
-    <PackageVersion Include="Argu" Version="6.0.0" />
-    <PackageVersion Include="Bullseye" Version="6.0.0" />
-    <PackageVersion Include="Proc" Version="0.9.1" />
-    <PackageVersion Include="Fake.Tools.Git" Version="5.15.0" />
+    <!-- Nullean.Make.Fs needs FSharp.Core 11.0.100 or later; only build/scripts uses it -->
+    <PackageVersion Include="FSharp.Core" Version="11.0.100" />
+    <PackageVersion Include="Nullean.Make.Fs" Version="0.25.0" />
+    <!-- the current release, which Nullean.Make.Fs would otherwise resolve at its 0.17.0 floor -->
+    <PackageVersion Include="Proc.Fs" Version="0.18.0" />
   </ItemGroup>
 </Project>
