@@ -1,13 +1,15 @@
 name: ci
 
+# nuget.org's trusted publishing policies name this file, so releasing happens here too: publishing the
+# release-drafter draft (web UI or phone) fires `release: published`, and the release job below runs on it.
+# Only v<version> releases publish packages. Model checkpoints release under models-<version> tags through
+# release-models.yml; the release job skips those.
 on:
   pull_request:
   push:
     branches: [main]
-    tags:
-      # Library/CLI releases only — "v" prefix distinguishes these from "models-*" tags, which
-      # release checkpoints independently via release-models.yml and never touch this pipeline.
-      - "v*.*.*"
+  release:
+    types: [published]
   workflow_dispatch:
 
 permissions: {}
@@ -106,39 +108,18 @@ jobs:
             echo "Retrying"; sleep 1
           done
 
-  # a pushed v* tag releases: release notes and the GitHub release
+  # A published v<version> release packs at that tag and pushes to nuget.org. A models-<version> release never does.
   release:
-    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
-    needs: build
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
+    if: github.event_name == 'release' && startsWith(github.event.release.tag_name, 'v')
+    needs: [build, zizmor]
+    uses: nullean/.github/.github/workflows/release.yml@83ef343759c443afe1964e9c33327527f8677b05 # v1.3.0
     permissions:
-      contents: write # create the GitHub release
-      issues: write # release-notes creates labels for its categories
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-        with:
-          fetch-depth: 0
-          persist-credentials: false
-
-      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
-        with:
-          cache: false # a release never restores a cache PR builds could have written
-        env:
-          MISE_JOBS: "1" # dotnet versions share one DOTNET_ROOT; installing them in parallel races
-
-      - name: Pack, validate and report public API changes
-        run: mise run pack
-
-      - name: Generate release notes for the tag
-        run: dotnet run --project build/scripts -- generatereleasenotes -s true
-
-      - name: Create or update the release for the tag on GitHub
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
-        run: dotnet run --project build/scripts -- createreleaseongithub -s true --token "$GITHUB_TOKEN"
-
-      # The nuget.org push is disabled for now (it was an `if: false` step, which actionlint rejects).
+      contents: write
+      id-token: write
+    with:
+      packages-path: build/output
+    secrets:
+      NUGET_USER: ${{ secrets.NUGET_USER }}
 
   # The docs build as docs.yml publishes it, without publishing, so a PR proves the build and post-build steps.
   docs:

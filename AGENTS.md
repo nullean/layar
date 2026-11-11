@@ -17,10 +17,24 @@ mise run pack     # build, pack, validate the packages, report public API change
 mise run ci       # exactly what CI runs: test, then pack
 mise run check    # workflow security checks (zizmor)
 mise run docs     # build the docs as CI does, then serve them
+mise run release  # show the release draft; `mise run release publish` releases
 ```
 
 `mise tasks ls` lists them all. Package output and API reports go to `build/output`. A new package needs an entry
 in `Paths.Packages` (`build/scripts/Paths.fs`): its project directory and assembly name differ from its id.
+
+## Releasing
+
+release-drafter keeps a draft release up to date from the labels of merged pull requests, tagged `v<version>`
+(`MinVerTagPrefix` is `v`). **Publishing the draft** releases: it creates the tag, and the `release` job in `ci.yml`
+packs at that version and pushes every package to nuget.org with trusted publishing. Every pull request carries
+exactly one release label.
+
+Model checkpoints release on their own `models-<version>` tags: pushing one runs `release-models.yml`, which exports
+the checkpoints and uploads them onto that release. The `release` job only runs for `v` tags, so a models release
+never publishes packages, and release-drafter's `tag-prefix: v` keeps models tags out of the next version. The
+[releasing](.claude/skills/releasing/SKILL.md) and [breaking-changes](.claude/skills/breaking-changes/SKILL.md)
+skills have the details.
 
 ## Conventions
 
