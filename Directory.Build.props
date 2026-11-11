@@ -8,7 +8,7 @@
     <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
     <IsPackable>false</IsPackable>
     <UseArtifactsOutput>true</UseArtifactsOutput>
-    <SolutionRoot>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), build.sh))</SolutionRoot>
+    <SolutionRoot>$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildThisFileDirectory), layar.slnx))</SolutionRoot>
     <ArtifactsPath>$(MSBuildThisFileDirectory).artifacts</ArtifactsPath>
 
     <ImplicitUsings>enable</ImplicitUsings>

@@ -29,7 +29,11 @@ let private currentVersionInformational =
 
 let private clean (arguments:ParseResults<Arguments>) =
     if (Paths.Output.Exists) then Paths.Output.Delete (true)
-    exec "dotnet" ["clean"] |> ignore
+    // clean every project but this build itself: `dotnet clean` on the solution would delete the assemblies the
+    // running build still loads lazily (Fake, Proc) and fail the next target
+    ["src"; "tests"; "examples"]
+    |> Seq.collect (fun d -> Directory.EnumerateFiles(d, "*.?sproj", SearchOption.AllDirectories))
+    |> Seq.iter (fun p -> exec "dotnet" ["clean"; p; "-c"; "Release"; "-v"; "q"] |> ignore)
 
 let private build (arguments:ParseResults<Arguments>) = exec "dotnet" ["build"; "-c"; "Release"] |> ignore
 
@@ -49,12 +53,18 @@ let private generatePackages (arguments:ParseResults<Arguments>) =
 
 let private validatePackages (arguments:ParseResults<Arguments>) =
     let output = Paths.RootRelative <| Paths.Output.FullName
+    let currentVersion = currentVersion.Value
     let nugetPackages =
         Paths.Output.GetFiles("*.nupkg") |> Seq.sortByDescending(fun f -> f.CreationTimeUtc)
-        |> Seq.map (fun p -> Paths.RootRelative p.FullName)
 
     let args = ["-v"; currentVersionInformational.Value; "-t"; output]
-    nugetPackages |> Seq.iter (fun p -> exec "dotnet" (["nupkg-validator"; p] @ args) |> ignore)
+    nugetPackages
+    |> Seq.iter (fun p ->
+        let packageId = Path.GetFileNameWithoutExtension(p.Name).Replace("." + currentVersion, "")
+        // only the package's own assembly: Layar.Cli bundles its dependencies (Google.Protobuf, ...) as a tool
+        let _, assembly = Paths.packageInfo packageId
+        exec "dotnet" (["nupkg-validator"; Paths.RootRelative p.FullName; "-a"; assembly] @ args) |> ignore
+    )
 
 
 let private generateApiChanges (arguments:ParseResults<Arguments>) =
@@ -70,11 +80,12 @@ let private generateApiChanges (arguments:ParseResults<Arguments>) =
             let f = sprintf "breaking-changes-%s.md" p
             Path.Combine(output, f)
         let args =
+            let projectDirectory, assembly = Paths.packageInfo p
             [
                 "assembly-differ"
                 (sprintf "previous-nuget|%s|%s|%s" p currentVersion Paths.MainTFM);
-                (sprintf "directory|.artifacts/bin/%s/release" p);
-                "-a"; "true"; "--target"; p; "-f"; "github-comment"; "--output"; outputFile
+                (sprintf "directory|.artifacts/bin/%s/release" projectDirectory);
+                "-a"; "true"; "--target"; assembly; "-f"; "github-comment"; "--output"; outputFile
             ]
 
         exec "dotnet" args |> ignore
@@ -142,6 +153,15 @@ let Setup (parsed:ParseResults<Arguments>) (subCommand:Arguments) =
     cmd Build.Name None (Some [Clean.Name]) <| fun _ -> build parsed
 
     cmd Test.Name (Some [Build.Name;]) None <| fun _ -> test parsed
+
+    cmd Pack.Name
+        (Some [Build.Name;])
+        (Some [GeneratePackages.Name; ValidatePackages.Name; GenerateApiChanges.Name])
+        ignore
+    cmd Ci.Name
+        (Some [Test.Name;])
+        (Some [GeneratePackages.Name; ValidatePackages.Name; GenerateApiChanges.Name])
+        ignore
 
     step PristineCheck.Name pristineCheck
     step GeneratePackages.Name generatePackages

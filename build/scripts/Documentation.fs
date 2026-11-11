@@ -225,7 +225,7 @@ let serve (port: int) =
 
     printfn ""
     printfn "  documentation serving at %s" url
-    printfn "  ctrl-c to stop; re-run './build.sh docs' to pick up edits"
+    printfn "  ctrl-c to stop; re-run 'mise run docs' to pick up edits"
     printfn ""
 
     let headless =

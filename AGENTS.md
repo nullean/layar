@@ -5,12 +5,22 @@
 Layar — a .NET port of [Laya](https://github.com/NandhaKishorM/laya), a non-autoregressive typed
 decision engine. See README.md for the package layout and measured numbers.
 
-## Build & Test
+## Commands
+
+mise installs the SDK pinned in `global.json` (plus the .NET 10 runtime every project targets). Run everything
+through it:
 
 ```bash
-dotnet build layar.slnx
-dotnet run --project tests/Laya.Tests/Laya.Tests.csproj -c Release
+mise run build    # build the solution
+mise run test     # build, then run the tests (TUnit, via dotnet run)
+mise run pack     # build, pack, validate the packages, report public API changes
+mise run ci       # exactly what CI runs: test, then pack
+mise run check    # workflow security checks (zizmor)
+mise run docs     # build the docs as CI does, then serve them
 ```
+
+`mise tasks ls` lists them all. Package output and API reports go to `build/output`. A new package needs an entry
+in `Paths.Packages` (`build/scripts/Paths.fs`): its project directory and assembly name differ from its id.
 
 ## Conventions
 
