@@ -1,30 +1,41 @@
-name: Always be deploying
+name: ci
 
 on:
   pull_request:
-    paths-ignore:
-      - 'README.md'
-      - '.editorconfig'
   push:
-    paths-ignore:
-      - 'README.md'
-      - '.editorconfig'
-    branches:
-      - main
+    branches: [main]
     tags:
       # Library/CLI releases only — "v" prefix distinguishes these from "models-*" tags, which
       # release checkpoints independently via release-models.yml and never touch this pipeline.
       - "v*.*.*"
+  workflow_dispatch:
 
-permissions:
-  contents: write
+permissions: {}
 
-env:
-  ARTIFACTS: 'build/output/*.nupkg'
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  build:
+    uses: nullean/.github/.github/workflows/dotnet-ci.yml@83ef343759c443afe1964e9c33327527f8677b05 # v1.3.0
+    permissions:
+      contents: read
+    with:
+      # Linux only, as before: aot-validate below covers the native dependencies on all three operating systems
+      os: '["ubuntu-latest"]'
+      packages-path: build/output
+
+  zizmor:
+    uses: nullean/.github/.github/workflows/zizmor.yml@83ef343759c443afe1964e9c33327527f8677b05 # v1.3.0
+    permissions:
+      contents: read
+
   aot-validate:
     runs-on: ${{ matrix.os.runner }}
+    timeout-minutes: 60
+    permissions:
+      contents: read
     strategy:
       fail-fast: false
       matrix:
@@ -42,85 +53,106 @@ jobs:
         - runner: windows-latest
           ext: '.exe'
     steps:
-    - uses: actions/checkout@v6
-
-    - uses: actions/setup-dotnet@v5
+    - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
-        global-json-file: ./global.json
+        persist-credentials: false
+
+    - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+      with:
+        cache: false # this workflow publishes what it builds; never restore a cache a PR could have written
+      env:
+        MISE_JOBS: "1" # dotnet versions share one DOTNET_ROOT; installing them in parallel races
 
     - name: Publish AOT
-      run: dotnet publish examples/${{ matrix.smoketest }}
+      shell: bash
+      env:
+        SMOKETEST: ${{ matrix.smoketest }}
+      run: dotnet publish "examples/$SMOKETEST"
 
     - name: Run AOT binary
       shell: bash
+      env:
+        SMOKETEST: ${{ matrix.smoketest }}
+        EXT: ${{ matrix.os.ext }}
       run: |
         # TorchSharp-cpu's libtorch_cpu.dylib hardcodes an absolute load path to homebrew's
         # libomp.dylib on macOS (see AGENTS.md's rough edges) — DYLD_LIBRARY_PATH lets dyld fall
         # back to the copy already bundled next to the binary instead.
         if [ "$RUNNER_OS" = "macOS" ]; then
-          export DYLD_LIBRARY_PATH="$PWD/.artifacts/publish/${{ matrix.smoketest }}/release"
+          export DYLD_LIBRARY_PATH="$PWD/.artifacts/publish/$SMOKETEST/release"
         fi
-        ./.artifacts/publish/${{ matrix.smoketest }}/release/${{ matrix.smoketest }}${{ matrix.os.ext }}
+        "./.artifacts/publish/$SMOKETEST/release/$SMOKETEST$EXT"
 
-  build:
+  # every push to main publishes a canary build to GitHub Packages
+  canary:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/heads/')
+    needs: build
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
-      contents: write
       packages: write
-      issues: write
     steps:
-    - uses: actions/checkout@v6
-      with:
-        fetch-depth: 1
-    - run: |
-        git fetch --prune --unshallow --tags
-        echo exit code $?
-        git tag --list
-    - uses: actions/setup-dotnet@v5
-      with:
-        dotnet-version: |
-          10.0.x
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: packages
+          path: packages
+      - name: Push to GitHub Packages
+        shell: bash
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          until dotnet nuget push 'packages/*.nupkg' -k "$GITHUB_TOKEN" \
+            -s https://nuget.pkg.github.com/nullean/index.json --skip-duplicate --no-symbols; do
+            echo "Retrying"; sleep 1
+          done
 
-    - run: ./build.sh build -s true
-      name: Build
-    - run: ./build.sh test -s true
-      name: Test
-    - run: ./build.sh generatepackages -s true
-      name: Generate local nuget packages
-    - run: ./build.sh validatepackages -s true
-      name: "validate *.nupkg files that were created"
-    - run: ./build.sh generateapichanges -s true
-      name: "Inspect public API changes"
+  # a pushed v* tag releases: release notes and the GitHub release
+  release:
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: write # create the GitHub release
+      issues: write # release-notes creates labels for its categories
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
 
-    - name: publish to github package repository
-      if: github.event_name == 'push' && startswith(github.ref, 'refs/heads')
-      shell: bash
-      run: |
-         until dotnet nuget push 'build/output/*.nupkg' -s https://nuget.pkg.github.com/nullean/index.json -k ${{secrets.GITHUB_TOKEN}} --skip-duplicate --no-symbols; do echo "Retrying"; sleep 1; done;
+      - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+        with:
+          cache: false # a release never restores a cache PR builds could have written
+        env:
+          MISE_JOBS: "1" # dotnet versions share one DOTNET_ROOT; installing them in parallel races
 
-    - run: ./build.sh generatereleasenotes -s true
-      name: Generate release notes for tag
-      if: github.event_name == 'push' && startswith(github.ref, 'refs/tags')
-    - run: ./build.sh createreleaseongithub -s true --token ${{secrets.GITHUB_TOKEN}}
-      if: github.event_name == 'push' && startswith(github.ref, 'refs/tags')
-      name: Create or update release for tag on github
+      - name: Pack, validate and report public API changes
+        run: mise run pack
 
-    - run: dotnet nuget push 'build/output/*.nupkg' -k ${{secrets.NUGET_ORG_API_KEY}} -s https://api.nuget.org/v3/index.json --skip-duplicate --no-symbols
-      name: release to nuget.org
-      # Disabled for now — re-enable by restoring:
-      # if: github.event_name == 'push' && startswith(github.ref, 'refs/tags')
-      if: false
+      - name: Generate release notes for the tag
+        run: dotnet run --project build/scripts -- generatereleasenotes -s true
+
+      - name: Create or update the release for the tag on GitHub
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: dotnet run --project build/scripts -- createreleaseongithub -s true --token "$GITHUB_TOKEN"
+
+      # The nuget.org push is disabled for now (it was an `if: false` step, which actionlint rejects).
 
   # The docs build as docs.yml publishes it, without publishing, so a PR proves the build and post-build steps.
   docs:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     permissions:
       contents: read
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Build documentation
-        uses: elastic/docs-builder@main
+        uses: elastic/docs-builder@036a375759d876e2df67955ebec0382cd6b09249 # v1
         env:
           FEATURE_NAVIGATION_PREVIEW: true
 
