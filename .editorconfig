@@ -161,3 +161,11 @@ dotnet_diagnostic.IDE0032.severity = none
 [tests/**/*.cs]
 dotnet_diagnostic.IDE0058.severity = none
 dotnet_diagnostic.IDE0022.severity = none
+
+# --- layar ----------------------------------------------------------------
+# Off in this repository's earlier .editorconfig; with warnings as errors in src/ they would fail the build.
+# IDE0305: `.ToArray()` over a LINQ chain stays (Presets.EmailQuestions).
+# IDE0005: unused usings are not a build failure (Routing/RouterEngine.cs).
+[*.cs]
+dotnet_diagnostic.IDE0305.severity = none
+dotnet_diagnostic.IDE0005.severity = none
