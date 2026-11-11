@@ -3,21 +3,21 @@
     <ManagePackageVersionsCentrally>true</ManagePackageVersionsCentrally>
   </PropertyGroup>
   <ItemGroup>
-    <GlobalPackageReference Include="MinVer" Version="7.0.0" PrivateAssets="All" />
+    <GlobalPackageReference Include="MinVer" Version="8.0.0" PrivateAssets="All" />
   </ItemGroup>
   <ItemGroup>
     <!-- Runtime dependencies -->
-    <PackageVersion Include="System.Numerics.Tensors" Version="10.0.12" />
-    <PackageVersion Include="Microsoft.ML.OnnxRuntime" Version="1.23.0" />
+    <PackageVersion Include="System.Numerics.Tensors" Version="10.0.14" />
+    <PackageVersion Include="Microsoft.ML.OnnxRuntime" Version="1.31.1" />
     <PackageVersion Include="TorchSharp" Version="0.107.0" />
     <PackageVersion Include="TorchSharp-cpu" Version="0.107.0" />
     <PackageVersion Include="TorchSharp.PyBridge" Version="1.4.4" />
   </ItemGroup>
   <ItemGroup>
     <!-- Test dependencies -->
-    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
-    <PackageVersion Include="TUnit" Version="1.17.25" />
-    <PackageVersion Include="AwesomeAssertions" Version="9.4.0" />
+    <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageVersion Include="TUnit" Version="1.80.0" />
+    <PackageVersion Include="AwesomeAssertions" Version="9.6.0" />
     <PackageVersion Include="Verify.TUnit" Version="31.13.2" />
   </ItemGroup>
   <ItemGroup>
@@ -26,14 +26,14 @@
   </ItemGroup>
   <ItemGroup>
     <!-- Test infrastructure -->
-    <PackageVersion Include="GitHubActionsTestLogger" Version="2.3.3" />
+    <PackageVersion Include="GitHubActionsTestLogger" Version="3.0.5" />
   </ItemGroup>
   <ItemGroup>
     <!-- Build script dependencies -->
-    <PackageVersion Include="FSharp.Core" Version="10.0.100" />
-    <PackageVersion Include="Argu" Version="6.0.0" />
-    <PackageVersion Include="Bullseye" Version="6.0.0" />
-    <PackageVersion Include="Proc" Version="0.9.1" />
-    <PackageVersion Include="Fake.Tools.Git" Version="5.15.0" />
+    <PackageVersion Include="FSharp.Core" Version="10.1.403" />
+    <PackageVersion Include="Argu" Version="6.2.5" />
+    <PackageVersion Include="Bullseye" Version="6.3.0" />
+    <PackageVersion Include="Proc" Version="0.14.0" />
+    <PackageVersion Include="Fake.Tools.Git" Version="6.2.0" />
   </ItemGroup>
 </Project>
