@@ -6,17 +6,10 @@ description: Release this repository. Use when the user asks to release, ship a 
 # Release
 
 Releases are never cut from a pushed tag. release-drafter keeps a **draft release** up to date from the labels of
-merged pull requests; **publishing that draft** creates the tag and runs `.github/workflows/ci.yml` on it, whose `release` job builds
-any binary assets, packs at the tag's version (MinVer) and pushes to nuget.org with trusted publishing.
-
-Layar has two kinds of release, told apart by the tag prefix:
-
-- **`v<version>`** (e.g. `v0.2.0`): the libraries and the CLI. release-drafter drafts these with the `v` prefix
-  (`MinVerTagPrefix` is `v`), and only these run the `release` job.
-- **`models-<version>`** (e.g. `models-1.0.0`): the exported checkpoints, uploaded as release assets by
-  `.github/workflows/release-models.yml` when that tag is pushed (or from `workflow_dispatch`). They never publish
-  packages, and release-drafter ignores them when it resolves the next version. Do not create one unless the user asks
-  for a checkpoint release.
+merged pull requests; **publishing that draft** creates the tag and runs `.github/workflows/ci.yml` on it. Its release
+jobs pack at the tag's version (MinVer), push to nuget.org with trusted publishing (always from a job of `ci.yml`
+itself, which the nuget.org policy names) and, in repositories that ship binaries, attach them to the release. Which
+jobs those are, and anything else this repository does on a release, is in the Releasing section of `AGENTS.md`.
 
 ## Steps
 
@@ -51,6 +44,7 @@ Layar has two kinds of release, told apart by the tag prefix:
 
 - Re-run the failed jobs (`gh run rerun <id> --failed`). The push uses `--skip-duplicate` and asset uploads use
   `--clobber`, so a re-run is safe.
-- `trusted publishing` errors mean nuget.org's policy no longer names this repo's `ci.yml`. Only the maintainer can
-  fix that on nuget.org.
+- `Token exchange failed (HTTP 401)` at the NuGet login means the push ran outside a job of this repo's `ci.yml` (for
+  example inside a shared workflow), or nuget.org's policy no longer names `ci.yml`. The first is a workflow fix; only
+  the maintainer can fix the second, on nuget.org.
 - Never delete a published tag or release to retry. Fix forward with a patch release.
