@@ -59,7 +59,6 @@ own NuGet metadata (not the project's marketing page):
 | Microsoft.ML.OnnxRuntime | MIT | https://github.com/microsoft/onnxruntime |
 | TorchSharp | MIT | https://github.com/dotnet/TorchSharp |
 | TorchSharp-cpu | MIT (wrapper); bundles libtorch under PyTorch's own BSD-style license | https://github.com/dotnet/TorchSharp, https://github.com/pytorch/pytorch |
-| TorchSharp.PyBridge | MIT | https://github.com/shaltielshmid/TorchSharp.PyBridge |
 | System.Numerics.Tensors | MIT | https://dot.net |
 
 None of these require reproducing their license text here beyond this notice — MIT and the
