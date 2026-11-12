@@ -65,7 +65,7 @@ let main argv =
                   // only the package's own assembly: Layar.Cli bundles its dependencies (Google.Protobuf, ...) as a tool
                   let _, assembly = Paths.packageInfo id
                   let package = Paths.RootRelative package.FullName
-                  sh $"dotnet nupkg-validator {package} -a {assembly} -v {informational} -t {output}" }
+                  sh $"dotnet nupkg-validator validate {package} -a {assembly} -v {informational} -t {output}" }
         | Generateapichanges -> target [] {
               let version = Versions.current.Value
               for _, id in packages version do
@@ -73,7 +73,7 @@ let main argv =
                   let report = Path.Combine(output, $"breaking-changes-{id}.md")
                   let projectDirectory, assembly = Paths.packageInfo id
                   // quoted: an unquoted | would pipe
-                  sh $"dotnet assembly-differ 'previous-nuget|{id}|{version}|{Paths.MainTFM}' 'directory|.artifacts/bin/{projectDirectory}/release' -a true --target {assembly} -f github-comment --output {report}" }
+                  sh $"dotnet assembly-differ diff 'previous-nuget|{id}|{version}|{Paths.MainTFM}' 'directory|.artifacts/bin/{projectDirectory}/release' -a --target {assembly} -f github-comment --output {report}" }
         | Docs -> target [] {
               Documentation.build ()
               Documentation.serve port.Value }

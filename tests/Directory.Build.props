@@ -5,9 +5,7 @@
     <NoWarn>$(NoWarn);CA1707</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="GitHubActionsTestLogger">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
+    <!-- 3.x is a Microsoft.Testing.Platform extension: its generated registration needs the compile assets -->
+    <PackageReference Include="GitHubActionsTestLogger" PrivateAssets="all" />
   </ItemGroup>
 </Project>
