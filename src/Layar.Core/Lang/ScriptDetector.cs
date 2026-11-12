@@ -133,7 +133,9 @@ public static class ScriptDetector
 		}
 
 		if (total == 0)
+#pragma warning disable IDE0301 // net11.0 suggests [], which net10.0 cannot build a FrozenDictionary from
 			return FrozenDictionary<string, double>.Empty;
+#pragma warning restore IDE0301
 
 		var profile = new Dictionary<string, double>();
 		if (latin > 0)

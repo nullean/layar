@@ -5,6 +5,8 @@ open System.IO
 
 let ToolName = "Layar"
 let Repository = "nullean/layar"
+/// The framework the public API diff reads from the previous release and from this build: the oldest the libraries
+/// target, which every release ships
 let MainTFM = "net10.0"
 let SignKey = ""
 
@@ -38,6 +40,12 @@ let Root =
     dir
 
 let RootRelative path = Path.GetRelativePath(Root.FullName, path)
+
+/// The build output the API diff reads: a library's MainTFM folder, or the one folder of a project that targets a single
+/// framework (a dotnet tool, net11.0 alone)
+let ApiDiffOutput (projectDirectory: string) =
+    let library = $".artifacts/bin/{projectDirectory}/release_{MainTFM}"
+    if Directory.Exists library then library else $".artifacts/bin/{projectDirectory}/release"
 
 let Output = DirectoryInfo(Path.Combine(Root.FullName, "build", "output"))
 
