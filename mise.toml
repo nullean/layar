@@ -8,8 +8,7 @@ DOTNET_CLI_TELEMETRY_OPTOUT = "1"
 DOTNET_SKIP_FIRST_TIME_EXPERIENCE = "1"
 
 [tools]
-# "10": every project targets net10.0, so the tests and the build run on the .NET 10 runtime
-dotnet = ["""{{ read_file(path='global.json') | split(pat='"version"') | nth(n=1) | split(pat='"') | nth(n=1) }}""", "10"]
+dotnet = ["""{{ read_file(path='global.json') | split(pat='"version"') | nth(n=1) | split(pat='"') | nth(n=1) }}"""]
 gh = "latest"
 zizmor = "1"
 

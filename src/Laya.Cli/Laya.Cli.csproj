@@ -2,6 +2,10 @@
 
   <PropertyGroup>
     <OutputType>Exe</OutputType>
+    <!-- a dotnet tool, not a library: net11.0 alone, so the TargetFrameworks src/ libraries get from
+         Directory.Build.props is cleared -->
+    <TargetFrameworks></TargetFrameworks>
+    <TargetFramework>net11.0</TargetFramework>
     <RootNamespace>Laya.Cli</RootNamespace>
     <!-- Not "layar": AssemblyName defaults PackageId too, and "layar" collides case-insensitively
          with Layar.Core's PackageId "Layar" ("Ambiguous project name 'layar'"). PackAsTool +

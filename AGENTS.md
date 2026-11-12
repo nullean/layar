@@ -7,8 +7,8 @@ decision engine. See README.md for the package layout and measured numbers.
 
 ## Commands
 
-mise installs the SDK pinned in `global.json` (plus the .NET 10 runtime every project targets). Run everything
-through it:
+mise installs the SDK pinned in `global.json`; the libraries target net10.0 and net11.0, the CLI, the tests and the
+examples net11.0. Run everything through it:
 
 ```bash
 mise run build    # build the solution
