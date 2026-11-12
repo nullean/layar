@@ -53,8 +53,8 @@ let main argv =
               for project in projectsToClean () do
                   sh $"dotnet clean {project} -c Release -v q" }
         | Build -> command {
-              composes [Clean]
-              executes (shell { sh $"dotnet build -c Release" }) }
+              composes [Clean] }
+                   |> executes { sh $"dotnet build -c Release" }
         | Test -> target [Build] { sh $"dotnet run --project tests/Laya.Tests/Laya.Tests.csproj -c Release" }
         | Pack -> command { requires [Build]; composes [Generatepackages; Validatepackages; Generateapichanges] }
         | Ci -> command { requires [Test]; composes [Generatepackages; Validatepackages; Generateapichanges] }
