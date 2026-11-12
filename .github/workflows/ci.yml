@@ -19,8 +19,11 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
+  # A release runs no tests of its own: the shared release workflow's main-green job requires main's full run, macOS
+  # included, to have passed on the released commit.
   build:
-    uses: nullean/.github/.github/workflows/dotnet-ci.yml@d850ce6eee9efa9f81b410d15fcd480409518d19 # v1.5.0
+    if: github.event_name != 'release'
+    uses: nullean/.github/.github/workflows/dotnet-ci.yml@e21d5f59405aa7078e51825cd4c407191e28562f # v1.6.1
     permissions:
       contents: read
     with:
@@ -29,11 +32,13 @@ jobs:
       packages-path: build/output
 
   zizmor:
-    uses: nullean/.github/.github/workflows/zizmor.yml@d850ce6eee9efa9f81b410d15fcd480409518d19 # v1.5.0
+    uses: nullean/.github/.github/workflows/zizmor.yml@e21d5f59405aa7078e51825cd4c407191e28562f # v1.6.1
     permissions:
       contents: read
 
+  # macOS runners are scarce: pull requests run Linux and Windows, main adds macOS.
   aot-validate:
+    if: github.event_name != 'release'
     runs-on: ${{ matrix.os.runner }}
     timeout-minutes: 60
     permissions:
@@ -47,13 +52,10 @@ jobs:
         # entirely different native dependencies.
         - layar-aot-smoketest
         - layar-torchsharp-aot-smoketest
-        os:
-        - runner: ubuntu-latest
-          ext: ''
-        - runner: macos-latest
-          ext: ''
-        - runner: windows-latest
-          ext: '.exe'
+        os: >-
+          ${{ fromJSON(github.event_name == 'push'
+            && '[{"runner":"ubuntu-latest","ext":""},{"runner":"macos-latest","ext":""},{"runner":"windows-latest","ext":".exe"}]'
+            || '[{"runner":"ubuntu-latest","ext":""},{"runner":"windows-latest","ext":".exe"}]') }}
     steps:
     - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       with:
@@ -109,12 +111,14 @@ jobs:
           done
 
   # A published v<version> release packs at that tag and pushes to nuget.org. A models-<version> release never does.
-  # packs at the release's tag in the shared workflow...
+  # packs at the release's tag in the shared workflow, which first fails unless main's ci.yml passed on the released
+  # commit (its main-green job)...
   release:
     if: github.event_name == 'release' && startsWith(github.event.release.tag_name, 'v')
-    needs: [build, zizmor]
-    uses: nullean/.github/.github/workflows/release.yml@d850ce6eee9efa9f81b410d15fcd480409518d19 # v1.5.0
+    needs: zizmor
+    uses: nullean/.github/.github/workflows/release.yml@e21d5f59405aa7078e51825cd4c407191e28562f # v1.6.1
     permissions:
+      actions: read # the main-green gate reads main's runs
       contents: write
     with:
       packages-path: build/output
@@ -134,12 +138,14 @@ jobs:
         with:
           name: release-packages
           path: packages
-      - uses: nullean/.github/actions/nuget-publish@d850ce6eee9efa9f81b410d15fcd480409518d19 # v1.5.0
+      - uses: nullean/.github/actions/nuget-publish@e21d5f59405aa7078e51825cd4c407191e28562f # v1.6.1
         with:
           user: ${{ secrets.NUGET_USER }}
           packages-path: packages
+
   # The docs build as docs.yml publishes it, without publishing, so a PR proves the build and post-build steps.
   docs:
+    if: github.event_name != 'release'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     permissions:
