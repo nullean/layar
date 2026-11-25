@@ -61,7 +61,7 @@ jobs:
       with:
         persist-credentials: false
 
-    - uses: jdx/mise-action@b44d12e7d0d8ee7461bb893e1b1993500433185b # v5.2.7
+    - uses: jdx/mise-action@236a21c3b91f5db6d4e174b348674a0f0caac06d # v5.2.9
       with:
         cache: false # this workflow publishes what it builds; never restore a cache a PR could have written
       env:
@@ -156,7 +156,7 @@ jobs:
           persist-credentials: false
 
       - name: Build documentation
-        uses: elastic/docs-builder@036a375759d876e2df67955ebec0382cd6b09249 # v1
+        uses: elastic/docs-builder@5ac22c7cebc84d83f13cb41fb9bfa15679506edf # v1.78.0
         env:
           FEATURE_NAVIGATION_PREVIEW: true
 
