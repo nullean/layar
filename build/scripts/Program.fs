@@ -1,7 +1,7 @@
 module Program
 
 open System.IO
-open Nullean.Make.Fs
+open Nullean.Runna.Fs
 open Proc.Fs
 
 /// The build's targets; `dotnet run --project build/scripts -- --help` lists them with these descriptions
@@ -43,7 +43,7 @@ let private projectsToClean () =
 
 [<EntryPoint>]
 let main argv =
-    let app = MakeApp<Target>("dotnet run --project build/scripts --", None)
+    let app = RunnaApp<Target>("dotnet run --project build/scripts --", None)
     let port = app.Option<int>("--port", desc = "Port to use when serving documentation", defaultValue = 8000)
 
     // `-s` skips what a target `requires`, never what it `composes`: build always cleans first
