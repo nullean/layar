@@ -229,13 +229,11 @@ let serve (port: int) =
         |> List.exists (fun v -> not (String.IsNullOrEmpty(Environment.GetEnvironmentVariable v)))
     if not headless then
         try
-            let opener, args =
-                if OperatingSystem.IsMacOS() then "open", url
-                elif OperatingSystem.IsWindows() then "cmd", sprintf "/c start %s" url
-                else "xdg-open", url
-            Diagnostics.ProcessStartInfo(opener, Arguments = args, UseShellExecute = false)
-            |> Diagnostics.Process.Start
-            |> ignore
+            let opener =
+                if OperatingSystem.IsMacOS() then cmd "open" [url]
+                elif OperatingSystem.IsWindows() then cmd "cmd" ["/c"; "start"; url]
+                else cmd "xdg-open" [url]
+            opener |> Cmd.allowFailure |> Cmd.run
         with _ -> ()
 
     let mutable running = true
