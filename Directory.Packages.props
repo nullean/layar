@@ -8,13 +8,13 @@
   <ItemGroup>
     <!-- Runtime dependencies -->
     <PackageVersion Include="System.Numerics.Tensors" Version="11.0.0" />
-    <PackageVersion Include="Microsoft.ML.OnnxRuntime" Version="1.31.1" />
+    <PackageVersion Include="Microsoft.ML.OnnxRuntime" Version="1.32.0" />
     <PackageVersion Include="TorchSharp" Version="0.107.0" />
     <PackageVersion Include="TorchSharp-cpu" Version="0.107.0" />
   </ItemGroup>
   <ItemGroup>
     <!-- Test dependencies -->
-    <PackageVersion Include="TUnit" Version="1.83.8" />
+    <PackageVersion Include="TUnit" Version="1.86.6" />
     <PackageVersion Include="AwesomeAssertions" Version="9.6.0" />
   </ItemGroup>
   <ItemGroup>
