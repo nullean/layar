@@ -27,10 +27,10 @@
   </ItemGroup>
   <ItemGroup>
     <!-- Build script dependencies -->
-    <!-- Nullean.Make.Fs needs FSharp.Core 11.0.101 or later; only build/scripts uses it -->
+    <!-- Runna.Fs needs FSharp.Core 11.0.101 or later; only build/scripts uses it -->
     <PackageVersion Include="FSharp.Core" Version="11.0.101" />
-    <PackageVersion Include="Nullean.Make.Fs" Version="0.30.0" />
-    <!-- build/scripts opens Proc.Fs directly, so it references it rather than relying on Nullean.Make.Fs -->
+    <PackageVersion Include="Runna.Fs" Version="0.2.1" />
+    <!-- build/scripts opens Proc.Fs directly, so it references it rather than relying on Runna.Fs -->
     <PackageVersion Include="Proc.Fs" Version="0.22.1" />
   </ItemGroup>
 </Project>
